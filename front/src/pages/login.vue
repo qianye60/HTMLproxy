@@ -72,6 +72,13 @@ async function register(){
         })
         const { access_token } = response.data
         userStore.setToken(access_token)
+        
+        // 立即更新登录状态
+        userStore.isLoggedIn.value = true
+        
+        // 等待一下确保状态更新
+        await new Promise(resolve => setTimeout(resolve, 100))
+        
         router.push('/control')
       }
       else{

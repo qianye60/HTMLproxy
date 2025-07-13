@@ -35,11 +35,16 @@ const router = createRouter({
 router.beforeEach(async (to, from) => {
   const userStore = useUserStore()
   
+  // 如果目标页面不需要认证，直接通过
+  if (!to.meta.requiresAuth) {
+    return true
+  }
+  
   // 检查登录状态
   const authResult = await userStore.checkLoginStatus()
   
   // 路由访问控制 - 处理需要登录的页面
-  if (to.meta.requiresAuth && !authResult.islogin) {
+  if (!authResult.islogin) {
     // 未登录时保存目标路由并跳转到登录页
     if (to.path !== '/') {
       sessionStorage.setItem("lastRoute", to.fullPath)
@@ -48,7 +53,7 @@ router.beforeEach(async (to, from) => {
   } 
   
   // 已登录用户访问登录页的处理
-  else if (to.name === 'login' && authResult.islogin) {
+  if (to.name === 'login' && authResult.islogin) {
     // 已登录用户访问登录页，检查是否有保存的路由
     const savedRoute = sessionStorage.getItem("lastRoute")
     if (savedRoute) {
@@ -62,6 +67,8 @@ router.beforeEach(async (to, from) => {
   if (to.path !== '/login') {
     sessionStorage.setItem("lastRoute", to.fullPath)
   }
+  
+  return true
 })
 
 export default router
