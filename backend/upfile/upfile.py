@@ -221,18 +221,4 @@ async def get_stats(
             "iconColor": "#10b981",
             "icon": "StorageIcon"
         }
-    ]
-
-@upfile.get("/html/{username}/{filename}")
-async def serve_html_file(username: str, filename: str):
-    """提供HTML文件访问"""
-    file_path = os.path.join(HTML_DIR, username, filename)
-    
-    if not os.path.exists(file_path):
-        raise HTTPException(status_code=404, detail="文件不存在")
-    
-    return FileResponse(
-        path=file_path,
-        media_type="text/html"
-        # 不加 filename 参数，避免浏览器下载
-    ) 
+    ] 

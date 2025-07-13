@@ -24,6 +24,11 @@ export default defineConfig({
         target: 'http://127.0.0.1:40000',
         changeOrigin: true,
         secure: false,
+      },
+      '/html': {
+        target: 'http://127.0.0.1:40000',
+        changeOrigin: true,
+        secure: false,
       }
     }
   },

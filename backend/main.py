@@ -35,6 +35,21 @@ app.add_middleware(
 async def root():
     return "Hello!"
 
+# HTML文件访问路由
+@app.get("/html/{username}/{filename}")
+async def serve_html_file(username: str, filename: str):
+    """提供HTML文件访问"""
+    HTML_DIR = "html_files"
+    file_path = os.path.join(HTML_DIR, username, filename)
+    
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="文件不存在")
+    
+    return FileResponse(
+        path=file_path,
+        media_type="text/html"
+    )
+
 if __name__ == "__main__":
     uvicorn.run("main:app",host="127.0.0.1",port=40000)
     
