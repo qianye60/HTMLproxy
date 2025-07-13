@@ -1,8 +1,8 @@
 # 前端构建阶段
-FROM node:18-alpine AS frontend-build
+FROM node:20-alpine AS frontend-build
 WORKDIR /app/front
 COPY front/package*.json ./
-RUN npm install --legacy-peer-deps
+RUN npm ci --legacy-peer-deps
 COPY front/ .
 RUN npm run build
 
