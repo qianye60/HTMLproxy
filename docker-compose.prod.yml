@@ -1,0 +1,18 @@
+version: '3.8'
+services:
+  htmlproxy:
+    image: qianye60/htmlproxy:latest
+    ports:
+      - "8080:80"
+    volumes:
+      - ./data:/app/data
+      - ./html_files:/app/html_files
+      - ./uploads:/app/uploads
+    environment:
+      - HTML_DIR=/app/html_files
+      - UPLOAD_DIR=/app/uploads
+    restart: unless-stopped
+
+networks:
+  default:
+    driver: bridge

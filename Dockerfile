@@ -16,11 +16,14 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Nginx镜像
 FROM nginx:stable-alpine AS nginx
-# 安装bash
-RUN apk add --no-cache bash
+# 安装bash和python
+RUN apk add --no-cache bash python3 py3-pip
 
 # 拷贝前端静态资源
 COPY --from=frontend-build /app/front/dist /usr/share/nginx/html
+
+# 拷贝后端代码和依赖
+COPY --from=backend-build /app/backend /app/backend
 
 # 拷贝nginx配置
 COPY nginx.conf /etc/nginx/nginx.conf

@@ -35,6 +35,7 @@ jobs:
         with:
           context: .
           file: ./Dockerfile
+          target: nginx
           push: true
           tags: ${{ steps.tags.outputs.tags }}
           platforms: linux/amd64
