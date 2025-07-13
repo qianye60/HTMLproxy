@@ -180,7 +180,7 @@ export const useUserStore = defineStore('user', () => {
         id: file.id,
         projectName: file.project_name,
         filename: file.filename,
-        url: file.url,
+        url: file.url, // 直接使用后端返回的相对路径，浏览器会基于当前页面域名解析
         size: file.size,
         uploadTime: file.upload_time,
         editProjectName: '',

@@ -122,7 +122,7 @@
                     
                     <!-- 文件名列 -->
                     <td class="filename-cell">
-                      <a :href="file.url" target="_blank" class="file-link">
+                      <a :href="getFileUrl(file.url)" target="_blank" class="file-link">
                         <div class="file-icon">
                           <svg viewBox="0 0 24 24" fill="currentColor">
                             <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
@@ -146,7 +146,7 @@
                     <td class="actions-cell">
                       <div class="action-buttons">
                         <a 
-                          :href="file.url" 
+                          :href="getFileUrl(file.url)" 
                           target="_blank" 
                           class="action-btn view-btn"
                           title="查看文件"
@@ -191,6 +191,35 @@
   <script setup lang="ts">
   import { ref, nextTick, onMounted } from 'vue'
   import { useUserStore } from '@/stores/user'
+
+  // 处理文件URL，确保在生产环境中使用正确的端口
+  const getFileUrl = (url: string): string => {
+    // 调试信息
+    console.log('原始URL:', url)
+    console.log('当前location:', {
+      protocol: window.location.protocol,
+      hostname: window.location.hostname,
+      port: window.location.port,
+      origin: window.location.origin
+    })
+    
+    // 如果URL已经是完整的绝对路径，直接返回
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      console.log('完整URL，直接返回:', url)
+      return url
+    }
+    
+    // 如果是相对路径且当前页面是通过40000端口访问的，重定向到8080端口
+    if (url.startsWith('/html/') && window.location.port === '40000') {
+      const newUrl = window.location.protocol + '//' + window.location.hostname + ':8080' + url
+      console.log('重定向到nginx端口:', newUrl)
+      return newUrl
+    }
+    
+    // 默认情况下直接返回相对路径，让浏览器基于当前页面解析
+    console.log('使用相对路径:', url)
+    return url
+  }
 
   const editInput = ref<HTMLInputElement[]>([])
   const userStore = useUserStore()
