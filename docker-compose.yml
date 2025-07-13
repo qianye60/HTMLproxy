@@ -4,7 +4,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      target: backend-build
+      target: backend
     volumes:
       - ./data:/app/data
       - ./html_files:/app/html_files
@@ -12,8 +12,6 @@ services:
     environment:
       - HTML_DIR=/app/html_files
       - UPLOAD_DIR=/app/uploads
-    command: uvicorn main:app --host 0.0.0.0 --port 40000
-    working_dir: /app/backend
     expose:
       - "40000"
     networks:

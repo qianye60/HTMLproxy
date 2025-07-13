@@ -1,7 +1,7 @@
 <template>
   <header class="nav-header">
     <div class="nav-logo">
-        <img src="/favicon.ico" alt="logo" class="owl-logo">
+      <img src = '../public/logo.ico' class="owl-logo"/>
       <span class="nav-title">灵枭HTML代理</span>
     </div>
     <nav class="nav-links">
@@ -37,8 +37,8 @@ import { RouterLink, RouterView } from 'vue-router'
   align-items: center;
 }
 .owl-logo {
-  width: 40px;
-  height: 40px;
+  width: 60px;
+  height: 60px;
   margin-right: 12px;
 }
 .nav-title {
