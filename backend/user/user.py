@@ -11,13 +11,16 @@ from sqlmodel import Field, Session, SQLModel, select, create_engine, Relationsh
 from jwt import decode, encode
 from pydantic import BaseModel
 
+# 使用环境变量获取密钥，避免写死在代码中，生产环境请务必设置 SECRET_KEY 环境变量
+import os
+SECRET_KEY = secrets.token_hex(32)
+
 # 创建路由器
 user = APIRouter()
 
 # 配置参数
 ACCESS_TOKEN_EXPIRE_DAYS = 7  # 访问令牌过期天数
 # 使用固定的密钥，避免每次重启都重新生成
-SECRET_KEY = "your-secret-key-here-please-change-in-production"  # 密钥
 ALGORITHM = "HS256"  # 加密算法
 
 # 密码加密上下文
