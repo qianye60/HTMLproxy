@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # 确保必要的目录存在
 mkdir -p /app/data /app/html_files /app/uploads

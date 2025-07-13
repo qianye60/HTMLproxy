@@ -42,4 +42,4 @@ RUN chmod +x /start.sh
 
 EXPOSE 80
 
-CMD ["/bin/bash", "/start.sh"] 
+CMD ["/bin/sh", "/start.sh"] 
