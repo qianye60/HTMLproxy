@@ -3,7 +3,7 @@ import secrets
 from datetime import datetime, timedelta, timezone
 from typing import Annotated, List
 from database import get_session, User, File
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Header
 from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
 from passlib.context import CryptContext
@@ -126,8 +126,15 @@ async def register(request: RegisterRequest, session: Session = Depends(get_sess
     return {"access_token": create_access_token(data={"sub": new_user.username}), "token_type": "Bearer"}
 
 @user.post("/verify")
-async def verify_token(token: Annotated[str, Depends(oauth2_scheme)], session: Session = Depends(get_session)):
+async def verify_token(authorization: str = Header(None), session: Session = Depends(get_session)):
     """验证用户令牌"""
+    
+    # 从Authorization头获取token
+    if not authorization or not authorization.startswith("Bearer "):
+        return {"islogin": False, "userauth": False}
+    
+    token = authorization.replace("Bearer ", "")
+    
     try:
         payload = decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username = payload["sub"]

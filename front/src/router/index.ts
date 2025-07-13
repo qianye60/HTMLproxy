@@ -40,6 +40,11 @@ router.beforeEach(async (to, from) => {
     return true
   }
   
+  // 如果已经登录且token存在，直接通过
+  if (userStore.isLoggedIn && userStore.token) {
+    return true
+  }
+  
   // 检查登录状态
   const authResult = await userStore.checkLoginStatus()
   

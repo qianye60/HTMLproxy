@@ -76,9 +76,13 @@ async function register(){
         // 立即更新登录状态
         userStore.isLoggedIn.value = true
         
+        // 清除错误信息
+        errorMsg.value = ''
+        
         // 等待一下确保状态更新
         await new Promise(resolve => setTimeout(resolve, 100))
         
+        // 跳转到控制面板
         router.push('/control')
       }
       else{

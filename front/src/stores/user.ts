@@ -112,10 +112,17 @@ export const useUserStore = defineStore('user', () => {
         clearToken()
         return { islogin: false }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Token验证失败:', error)
-      isLoggedIn.value = false
-      clearToken()
+      // 如果是网络错误或服务器错误，不清除token，保持当前状态
+      if (error.code === 'NETWORK_ERROR' || error.response?.status >= 500) {
+        return { islogin: false }
+      }
+      // 如果是401错误，说明token无效，清除token
+      if (error.response?.status === 401) {
+        isLoggedIn.value = false
+        clearToken()
+      }
       return { islogin: false }
     }
   }
