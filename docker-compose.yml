@@ -1,0 +1,27 @@
+version: '3.8'
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: backend-build
+    volumes:
+      - ./data:/app/data
+      - ./html_files:/app/html_files
+      - ./uploads:/app/uploads
+    command: uvicorn main:app --host 0.0.0.0 --port 40000
+    working_dir: /app/backend
+    expose:
+      - "40000"
+  nginx:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    volumes:
+      - ./data:/app/data
+      - ./html_files:/app/html_files
+      - ./uploads:/app/uploads 
