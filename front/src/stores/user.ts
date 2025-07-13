@@ -91,9 +91,9 @@ export const useUserStore = defineStore('user', () => {
         return { islogin: false }
       }
       
-      // 如果已经有登录状态且token存在，直接返回
-      if (isLoggedIn.value && token.value === storedToken) {
-        return { islogin: true, userauth: true }
+      // 设置token（如果还没有设置的话）
+      if (token.value !== storedToken) {
+        token.value = storedToken
       }
       
       const response = await axios.post('/verify', {}, {

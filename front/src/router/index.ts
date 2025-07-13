@@ -70,16 +70,7 @@ router.beforeEach(async (to, from) => {
     }
     return { name: 'login' }
   }
-  // 6. 其它逻辑...
-  if (to.path === '/' && authResult.islogin) {
-    return { name: 'control' }
-  }
-  if(to.name === 'control' && authResult.islogin){
-    return { name: 'control' }
-  }
-  if (to.path !== '/login') {
-    sessionStorage.setItem("lastRoute", to.fullPath)
-  }
+  // 6. 已通过验证，允许访问
   return true
 })
 
