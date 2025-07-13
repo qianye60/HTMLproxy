@@ -7,5 +7,8 @@ mkdir -p /app/data /app/html_files /app/uploads
 cd /app/backend
 uvicorn main:app --host 0.0.0.0 --port 40000 &
 
+# 等待后端服务启动
+sleep 3
+
 # 启动Nginx
 nginx -g "daemon off;" 

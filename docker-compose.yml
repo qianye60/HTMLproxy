@@ -13,15 +13,25 @@ services:
     working_dir: /app/backend
     expose:
       - "40000"
+    networks:
+      - app-network
+
   nginx:
     build:
       context: .
       dockerfile: Dockerfile
+      target: nginx
     ports:
-      - "80:80"
+      - "8080:80"
     depends_on:
       - backend
     volumes:
       - ./data:/app/data
       - ./html_files:/app/html_files
-      - ./uploads:/app/uploads 
+      - ./uploads:/app/uploads
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge 

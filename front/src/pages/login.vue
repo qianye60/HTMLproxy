@@ -66,7 +66,7 @@ async function register(){
     if (!validateForm()) return;
     try {
       if(isregister.value == false){//登录
-        const response = await axios.post("/api/login", {
+        const response = await axios.post("/login", {
           email: formData.value.email,
           password: formData.value.password
         })
@@ -75,7 +75,7 @@ async function register(){
         router.push('/control')
       }
       else{
-        const response = await axios.post("/api/register",{
+        const response = await axios.post("/register",{
           username: formData.value.username,
           email: formData.value.email,
           password: formData.value.password
