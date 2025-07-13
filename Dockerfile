@@ -1,9 +1,14 @@
 # 前端构建阶段
-FROM node:20-alpine AS frontend-build
+FROM node:18-alpine AS frontend-build
 WORKDIR /app/front
 COPY front/package*.json ./
 RUN npm ci --legacy-peer-deps
 COPY front/ .
+# 设置环境变量以解决crypto兼容性问题
+ENV NODE_OPTIONS="--experimental-global-webcrypto"
+# 清理缓存并重新安装
+RUN rm -rf node_modules package-lock.json
+RUN npm ci --legacy-peer-deps
 RUN npm run build
 
 # 后端构建阶段
