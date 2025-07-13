@@ -16,8 +16,8 @@ from pydantic import BaseModel
 upfile = APIRouter()
 
 # 文件存储配置
-UPLOAD_DIR = "uploads"
-HTML_DIR = "html_files"
+UPLOAD_DIR = os.getenv("UPLOAD_DIR", "uploads")  # 支持环境变量配置
+HTML_DIR = os.getenv("HTML_DIR", "html_files")  # 支持环境变量配置
 
 # 确保上传目录存在
 os.makedirs(UPLOAD_DIR, exist_ok=True)

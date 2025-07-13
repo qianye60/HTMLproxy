@@ -39,7 +39,7 @@ async def root():
 @app.get("/html/{username}/{filename}")
 async def serve_html_file(username: str, filename: str):
     """提供HTML文件访问"""
-    HTML_DIR = "html_files"
+    HTML_DIR = os.getenv("HTML_DIR", "html_files")  # 支持环境变量配置
     file_path = os.path.join(HTML_DIR, username, filename)
     
     if not os.path.exists(file_path):
