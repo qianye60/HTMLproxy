@@ -34,19 +34,25 @@ const router = createRouter({
  */
 router.beforeEach(async (to, from) => {
   const userStore = useUserStore()
-  // 1. 已登录用户访问登录页，直接跳转到控制面板
-  if (to.name === 'login' && (userStore.isLoggedIn || userStore.token)) {
-    // 检查登录状态（防止刷新丢失）
-    const authResult = await userStore.checkLoginStatus()
-    if (authResult.islogin) {
-      const savedRoute = sessionStorage.getItem("lastRoute")
-      if (savedRoute) {
-        sessionStorage.removeItem("lastRoute")
-        return savedRoute
+  
+  // 1. 特殊处理：已登录用户访问登录页，验证token后决定是否跳转
+  if (to.name === 'login') {
+    if (userStore.isLoggedIn || userStore.token) {
+      // 验证当前token是否有效
+      const authResult = await userStore.checkLoginStatus()
+      if (authResult.islogin) {
+        const savedRoute = sessionStorage.getItem("lastRoute")
+        if (savedRoute) {
+          sessionStorage.removeItem("lastRoute")
+          return savedRoute
+        }
+        return { name: 'control' }
       }
-      return { name: 'control' }
     }
+    // token无效或不存在，允许访问登录页
+    return true
   }
+  
   // 2. 如果目标页面不需要认证，直接通过
   if (!to.meta.requiresAuth) {
     return true
