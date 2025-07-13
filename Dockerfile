@@ -25,10 +25,8 @@ COPY nginx.conf /etc/nginx/nginx.conf
 # 拷贝后端
 COPY --from=backend-build /app/backend /app/backend
 
-# 拷贝数据库和上传目录（如有）
-COPY data /app/data
-COPY html_files /app/html_files
-COPY uploads /app/uploads
+# 创建必要的目录
+RUN mkdir -p /app/data /app/html_files /app/uploads
 
 # 启动脚本
 COPY start.sh /start.sh
