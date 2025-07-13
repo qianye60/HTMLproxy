@@ -1,13 +1,13 @@
 # 前端构建阶段
-FROM node:18 AS frontend-build
+FROM node:18-alpine AS frontend-build
 WORKDIR /app/front
 COPY front/package*.json ./
-RUN npm install
+RUN npm install --legacy-peer-deps
 COPY front/ .
-RUN npm run build || (echo "构建失败，尝试跳过类型检查..." && npm run build-only)
+RUN npm run build
 
 # 后端构建阶段
-FROM python:3.10 AS backend-build
+FROM python:3.10-alpine AS backend-build
 WORKDIR /app/backend
 COPY backend/ .
 RUN pip install --no-cache-dir -r requirements.txt
