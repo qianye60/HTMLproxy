@@ -16,8 +16,8 @@ def on_startup():
     create_db_and_tables()
 
 # 注册路由
-app.include_router(user_router, prefix='', tags=['用户认证'])
-app.include_router(upfile_router, prefix='', tags=['文件管理'])
+app.include_router(user_router, prefix='/api', tags=['用户认证'])
+app.include_router(upfile_router, prefix='/api', tags=['文件管理'])
 
 # 配置 CORS
 app.add_middleware(

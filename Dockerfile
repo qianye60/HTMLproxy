@@ -15,8 +15,11 @@ COPY backend/ .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # 生产镜像
-FROM nginx:1.25
+FROM python:3.10-alpine
 WORKDIR /app
+
+# 安装nginx
+RUN apk add --no-cache nginx
 
 # 拷贝前端静态资源
 COPY --from=frontend-build /app/front/dist /app/front/dist
@@ -26,6 +29,9 @@ COPY nginx.conf /etc/nginx/nginx.conf
 
 # 拷贝后端
 COPY --from=backend-build /app/backend /app/backend
+
+# 安装后端依赖
+RUN pip install --no-cache-dir -r /app/backend/requirements.txt
 
 # 创建必要的目录
 RUN mkdir -p /app/data /app/html_files /app/uploads
