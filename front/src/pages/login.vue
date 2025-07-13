@@ -69,34 +69,43 @@ async function register(){
         const response = await axios.post("/login", {
           email: formData.value.email,
           password: formData.value.password
+        }, {
+          headers: {
+            'Content-Type': 'application/json'
+          }
         })
         const { access_token } = response.data
         userStore.setToken(access_token)
         
         // 立即更新登录状态
-        userStore.isLoggedIn.value = true
+        userStore.isLoggedIn = true
         
         // 清除错误信息
         errorMsg.value = ''
         
-        // 等待一下确保状态更新
-        await new Promise(resolve => setTimeout(resolve, 100))
-        
         // 跳转到控制面板
-        router.push('/control')
+        try {
+          await router.push('/control')
+        } catch (routerError) {
+          console.error('路由跳转失败:', routerError)
+        }
       }
       else{
         const response = await axios.post("/register",{
           username: formData.value.username,
           email: formData.value.email,
           password: formData.value.password
+        }, {
+          headers: {
+            'Content-Type': 'application/json'
+          }
         })
-        alert("注册成功!请登录")
+        alert("注册成功!")
         isregister.value = false
         formData.value.username = ''
       }
     } catch (err) {
-      console.error('请求错误:', err);
+      console.error('请求错误:', err, err?.response, err?.message, err?.stack);
       if (err.response && err.response.data && err.response.data.detail) {
         errorMsg.value = err.response.data.detail
       } else {

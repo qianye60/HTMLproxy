@@ -16,11 +16,9 @@ user = APIRouter()
 
 # 配置参数
 ACCESS_TOKEN_EXPIRE_DAYS = 7  # 访问令牌过期天数
-SECRET_KEY = secrets.token_hex(32)  # 密钥
+# 使用固定的密钥，避免每次重启都重新生成
+SECRET_KEY = "your-secret-key-here-please-change-in-production"  # 密钥
 ALGORITHM = "HS256"  # 加密算法
-
-if not SECRET_KEY:
-    raise ValueError("必须提供SECRET_KEY环境变量!")
 
 # 密码加密上下文
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

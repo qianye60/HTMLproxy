@@ -34,45 +34,46 @@ const router = createRouter({
  */
 router.beforeEach(async (to, from) => {
   const userStore = useUserStore()
-  
-  // 如果目标页面不需要认证，直接通过
+  // 1. 已登录用户访问登录页，直接跳转到控制面板
+  if (to.name === 'login' && (userStore.isLoggedIn || userStore.token)) {
+    // 检查登录状态（防止刷新丢失）
+    const authResult = await userStore.checkLoginStatus()
+    if (authResult.islogin) {
+      const savedRoute = sessionStorage.getItem("lastRoute")
+      if (savedRoute) {
+        sessionStorage.removeItem("lastRoute")
+        return savedRoute
+      }
+      return { name: 'control' }
+    }
+  }
+  // 2. 如果目标页面不需要认证，直接通过
   if (!to.meta.requiresAuth) {
     return true
   }
-  
-  // 如果已经登录且token存在，直接通过
+  // 3. 如果已经登录且token存在，直接通过
   if (userStore.isLoggedIn && userStore.token) {
     return true
   }
-  
-  // 检查登录状态
+  // 4. 检查登录状态
   const authResult = await userStore.checkLoginStatus()
-  
-  // 路由访问控制 - 处理需要登录的页面
+  // 5. 路由访问控制 - 处理需要登录的页面
   if (!authResult.islogin) {
-    // 未登录时保存目标路由并跳转到登录页
     if (to.path !== '/') {
       sessionStorage.setItem("lastRoute", to.fullPath)
     }
     return { name: 'login' }
-  } 
-  
-  // 已登录用户访问登录页的处理
-  if (to.name === 'login' && authResult.islogin) {
-    // 已登录用户访问登录页，检查是否有保存的路由
-    const savedRoute = sessionStorage.getItem("lastRoute")
-    if (savedRoute) {
-      sessionStorage.removeItem("lastRoute")
-      return savedRoute
-    }
+  }
+  // 6. 其它逻辑...
+  if (to.path === '/' && authResult.islogin) {
     return { name: 'control' }
   }
-  
-  // 保存非登录页面的路由，用于刷新恢复
+  if(to.name === 'control' && authResult.islogin){
+    return { name: 'control' }
+  }
   if (to.path !== '/login') {
     sessionStorage.setItem("lastRoute", to.fullPath)
   }
-  
   return true
 })
 

@@ -19,5 +19,12 @@ export default defineConfig({
     host: '127.0.0.1',
     port: 40001,
     hmr : true,
+    proxy: {
+      '/api': {
+        target: 'http://127.0.0.1:40000',
+        changeOrigin: true,
+        secure: false,
+      }
+    }
   },
 })

@@ -7,6 +7,9 @@ from fastapi import FastAPI #类型注解
 from user.user import user as user_router
 from upfile.upfile import upfile as upfile_router
 from database import create_db_and_tables
+import os
+from fastapi.responses import FileResponse
+from fastapi import HTTPException
 
 app = FastAPI()#网站上线需要增加参数关闭测试文档 docs_url=None, redoc_url=None,openapi_url=None
 
