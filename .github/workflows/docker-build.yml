@@ -28,7 +28,7 @@ jobs:
         run: |
           TIMESTAMP=$(date +'%Y%m%d-%H%M%S')
           COMMIT_SHA_SHORT=$(echo $GITHUB_SHA | cut -c1-7)
-          echo "tags=htmlproxy:latest,htmlproxy:$TIMESTAMP,htmlproxy:$COMMIT_SHA_SHORT" >> $GITHUB_OUTPUT
+          echo "tags=qianye60/htmlproxy:latest,qianye60/htmlproxy:$TIMESTAMP,qianye60/htmlproxy:$COMMIT_SHA_SHORT" >> $GITHUB_OUTPUT
 
       - name: 构建并推送Docker镜像
         uses: docker/build-push-action@v6
@@ -38,5 +38,5 @@ jobs:
           push: true
           tags: ${{ steps.tags.outputs.tags }}
           platforms: linux/amd64
-          cache-from: type=registry,ref=htmlproxy:buildcache
-          cache-to: type=registry,ref=htmlproxy:buildcache,mode=max,ignore-error=true 
+          cache-from: type=registry,ref=qianye60/htmlproxy:buildcache
+          cache-to: type=registry,ref=qianye60/htmlproxy:buildcache,mode=max,ignore-error=true 
