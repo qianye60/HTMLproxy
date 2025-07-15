@@ -2,8 +2,10 @@
   <div class="login-container">
     <div class="form-box">
       <form class="form" @submit.prevent="register">
-        <span class="title">登录/注册</span>
-        <span class="subtitle">使用邮箱登录/注册</span>
+        <span v-if="!isregister" class="title">登录</span>
+        <span v-else class="title">注册</span>
+        <span v-if="!isregister" class="subtitle">使用邮箱登录</span>
+        <span v-else class="subtitle">使用邮箱注册</span>
         <div class="form-container">
           <input v-if="isregister" type="text" class="input" placeholder="用户名" v-model="formData.username">
           <input type="email" class="input" placeholder="邮箱" v-model="formData.email">
@@ -24,7 +26,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useUserStore } from '../stores/user'
 import axios from "axios";
 import { useRouter } from 'vue-router'
@@ -34,6 +36,13 @@ const userStore = useUserStore()
 const isregister = ref(false)
 const errorMsg = ref('')
 
+// 禁止页面滚动
+onMounted(() => {
+  document.body.style.overflow = 'hidden'
+})
+onUnmounted(() => {
+  document.body.style.overflow = ''
+})
 // 表单数据
 const formData = ref({
   username: '',
@@ -123,13 +132,15 @@ function toggleRegister() {
 <style scoped>
 .login-container {
   min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
   display: flex;
   justify-content: center;
   align-items: center;
   background: #f8fafc;
 }
 .form-box {
-  max-width: 320px;
+  max-width: 360px;
   background: #f1fdf4;
   overflow: hidden;
   border-radius: 16px;
@@ -164,11 +175,30 @@ function toggleRegister() {
   background: none;
   border: 0;
   outline: 0;
-  height: 40px;
+  height: 60px;
   width: 100%;
-  border-bottom: 1px solid #e0e0e0;
-  font-size: .95rem;
-  padding: 8px 15px;
+  min-width: 240px;
+  max-width: 320px;
+  border-bottom: 1.5px solid #e0e0e0;
+  font-size: 1.15rem;
+  padding: 8px 40px 8px 15px; /* 右侧留空间给小眼睛 */
+  box-sizing: border-box;
+}
+.input[type="password"] {
+  padding-right: 40px;
+}
+.password-eye {
+  position: absolute;
+  right: 32px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  z-index: 2;
+  background: none;
+  border: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
 }
 .form-section {
   padding: 16px;

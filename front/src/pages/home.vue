@@ -1,806 +1,1195 @@
 <template>
-  <div class="home-hero">
-    <div class="container">
-      <!-- 顶部标题区 -->
-      <h1 class="main-title">灵枭HTML代理 - 极速网页发布新体验</h1>
-      <h2 class="sub-title">一键托管 · 无需配置 · 绿色安全 · 全球可达</h2>
-      <p class="desc">
-        灵枭HTML代理为创作者、开发者和设计师提供极速、便捷的网页托管服务。无需服务器、无需域名，上传即刻生成全球可访问链接，让您的灵感瞬间上线，安全可靠，永久免费。
-      </p>
-
-      <!-- 特色功能区 -->
-      <div class="features">
-        <div class="feature" v-for="f in features" :key="f.title">
-          <span class="feature-icon" v-html="f.svg"></span>
-          <div class="feature-title">{{ f.title }}</div>
-          <div class="feature-desc">{{ f.desc }}</div>
+  <div class="html-proxy-hero">
+    <!-- 动态背景网格 -->
+    <div class="bg-grid"></div>
+    
+    <!-- 主要内容区域 -->
+    <div class="hero-container">
+      <!-- 英雄区域 -->
+      <section class="hero-section">
+        <div class="hero-badge">
+          <Zap class="badge-icon" />
+          <span>HTML 极速托管</span>
         </div>
-      </div>
+        
+        <h1 class="hero-title">
+          <span class="main-text">将您的 HTML</span>
+          <br />
+          <span class="highlight-text">瞬间发布全球</span>
+        </h1>
+        
+        <p class="hero-subtitle">
+          专业的 HTML 文件托管服务，无需服务器、无需域名配置
+          <br>
+          <strong>3秒上线 • 全球访问 • 永久免费 • 极速稳定</strong>
+        </p>
 
-      <!-- 服务卡片区 -->
-      <div class="cards">
-        <div class="service-card" v-for="card in cards" :key="card.title">
-          <span class="card-icon" v-html="card.svg"></span>
-          <div class="card-title">{{ card.title }}</div>
-          <div class="card-desc">{{ card.desc }}</div>
-          <button 
-            class="card-btn"
-            :class="card.btnClass"
-            @click="handleCardClick(card.title)"
-          >
-            {{ card.btn }}
+        <div class="hero-actions">
+          <button class="primary-btn" @click="quickStart">
+            <Upload class="btn-icon" />
+            立即上传文件
+          </button>
+          <button class="secondary-btn" @click="viewDemo">
+            <Eye class="btn-icon" />
+            查看演示
           </button>
         </div>
-      </div>
 
-      <!-- 三步流程 -->
-      <div class="steps-title">三步轻松发布您的网页</div>
-      <div class="steps">
-        <div class="step" v-for="(step, idx) in steps" :key="step.title">
-          <div class="step-circle">{{ idx + 1 }}</div>
-          <div class="step-title">{{ step.title }}</div>
-          <div class="step-desc">{{ step.desc }}</div>
+        <!-- 实时统计 -->
+        <div class="stats-bar">
+          <div class="stat-item">
+            <Globe class="stat-icon" />
+            <span class="stat-number">50,000+</span>
+            <span class="stat-label">文件已托管</span>
+          </div>
+          <div class="stat-item">
+            <Clock class="stat-icon" />
+            <span class="stat-number">< 3秒</span>
+            <span class="stat-label">上线速度</span>
+          </div>
+          <div class="stat-item">
+            <Shield class="stat-icon" />
+            <span class="stat-number">99.9%</span>
+            <span class="stat-label">稳定运行</span>
+          </div>
         </div>
-      </div>
+      </section>
 
-      <!-- 页脚 -->
-      <footer class="footer">
-        <div>
-          <strong>灵枭HTML代理</strong> · 极速网页托管平台<br>
-          <span class="footer-links">
-            <a href="/about" @click.prevent>关于平台</a> |
-            <a href="/contact" @click.prevent>联系我们</a> |
-            <a href="/privacy" @click.prevent>隐私政策</a> |
-            <a href="/terms" @click.prevent>服务条款</a>
-          </span>
+      <!-- 核心优势区域 -->
+      <section class="features-section">
+        <div class="section-header">
+          <h2 class="section-title">为什么选择灵枭HTML代理？</h2>
+          <p class="section-subtitle">专业、快速、可靠的HTML文件托管解决方案</p>
         </div>
-        <div class="footer-copy">© 2025 灵枭HTML代理 保留所有权利</div>
-      </footer>
+
+        <div class="features-grid">
+          <div class="feature-card" v-for="feature in features" :key="feature.id">
+            <div class="feature-icon">
+              <component :is="feature.icon" />
+            </div>
+            <h3 class="feature-title">{{ feature.title }}</h3>
+            <p class="feature-desc">{{ feature.description }}</p>
+            <div class="feature-highlight">{{ feature.highlight }}</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 使用流程 -->
+      <section class="workflow-section">
+        <div class="section-header">
+          <h2 class="section-title">三步完成全球发布</h2>
+          <p class="section-subtitle">简单到不可思议的发布流程</p>
+        </div>
+
+        <div class="workflow-steps">
+          <div class="step-item" v-for="(step, index) in workflowSteps" :key="index">
+            <div class="step-number">{{ index + 1 }}</div>
+            <div class="step-content">
+              <div class="step-icon">
+                <component :is="step.icon" />
+              </div>
+              <h3 class="step-title">{{ step.title }}</h3>
+              <p class="step-desc">{{ step.description }}</p>
+            </div>
+            <div v-if="index < workflowSteps.length - 1" class="step-connector">
+              <ArrowRight class="connector-icon" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 技术特性 -->
+      <section class="tech-section">
+        <div class="tech-grid">
+          <div class="tech-card">
+            <div class="tech-header">
+              <Server class="tech-icon" />
+              <h3>无需服务器</h3>
+            </div>
+            <p>告别复杂的服务器配置和维护，我们的云基础设施为您处理一切技术细节</p>
+            <div class="tech-tags">
+              <span class="tag">零配置</span>
+              <span class="tag">自动扩展</span>
+              <span class="tag">高可用</span>
+            </div>
+          </div>
+
+          <div class="tech-card">
+            <div class="tech-header">
+              <Globe class="tech-icon" />
+              <h3>全球CDN加速</h3>
+            </div>
+            <p>基于全球CDN网络分发，确保您的HTML页面在世界任何角落都能极速加载</p>
+            <div class="tech-tags">
+              <span class="tag">全球节点</span>
+              <span class="tag">智能路由</span>
+              <span class="tag">极速访问</span>
+            </div>
+          </div>
+
+          <div class="tech-card">
+            <div class="tech-header">
+              <Shield class="tech-icon" />
+              <h3>安全可靠</h3>
+            </div>
+            <p>企业级安全防护，SSL加密传输，确保您的文件和访问者数据绝对安全</p>
+            <div class="tech-tags">
+              <span class="tag">SSL加密</span>
+              <span class="tag">DDoS防护</span>
+              <span class="tag">数据备份</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 支持的文件类型 -->
+      <section class="file-types-section">
+        <div class="section-header">
+          <h2 class="section-title">支持多种文件格式</h2>
+          <p class="section-subtitle">完整的前端项目托管支持</p>
+        </div>
+
+        <div class="file-types-grid">
+          <div class="file-type-item" v-for="fileType in fileTypes" :key="fileType.name">
+            <div class="file-icon" :style="{ backgroundColor: fileType.color }">
+              <component :is="fileType.icon" />
+            </div>
+            <h4>{{ fileType.name }}</h4>
+            <p>{{ fileType.description }}</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 行动召唤 -->
+      <section class="cta-section">
+        <div class="cta-content">
+          <div class="cta-icon">
+            <Rocket />
+          </div>
+          <h2 class="cta-title">准备发布您的HTML项目？</h2>
+          <p class="cta-subtitle">
+            立即体验最快速的HTML文件托管服务，让您的作品瞬间上线
+          </p>
+          <button class="cta-button" @click="getStarted">
+            <Upload class="btn-icon" />
+            免费开始使用
+            <ArrowRight class="btn-arrow" />
+          </button>
+          <p class="cta-note">无需注册 • 完全免费 • 即刻开始</p>
+        </div>
+      </section>
     </div>
 
-    <!-- 改进的弹窗组件 -->
-    <Teleport to="body">
-      <!-- 极速托管弹窗 -->
-      <div v-if="showUploadModal" class="modal-overlay" @click="closeUploadModal">
-        <div class="modal-content" @click.stop>
-          <button class="modal-close" @click="closeUploadModal">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            </svg>
+    <!-- 快速演示弹窗 -->
+    <div v-if="showDemoModal" class="modal-overlay" @click="closeDemoModal">
+      <div class="demo-modal" @click.stop>
+        <div class="modal-header">
+          <div class="demo-avatar">
+            <Play class="avatar-icon" />
+          </div>
+          <h3>快速演示</h3>
+          <button class="close-btn" @click="closeDemoModal">
+            <X />
           </button>
-          <div class="modal-header">
-            <div class="modal-icon">
-              <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-                <rect x="8" y="12" width="32" height="24" rx="6" stroke="#22c55e" stroke-width="3"/>
-                <path d="M24 18v10M24 28l-4-4m4 4l4-4" stroke="#22c55e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-              </svg>
+        </div>
+        <div class="modal-body">
+          <div class="demo-steps">
+            <div class="demo-step">
+              <div class="step-number">1</div>
+              <div class="step-content">
+                <h4>选择HTML文件</h4>
+                <p>点击上传按钮，选择您的HTML文件及相关资源</p>
+              </div>
             </div>
-            <h2>极速托管服务</h2>
-          </div>
-          <div class="modal-body">
-            <p class="modal-description">
-              体验最快速的HTML文件托管服务，让您的网页瞬间上线！
-            </p>
-            <div class="feature-list">
-              <div class="feature-item">
-                <span class="check-icon">✓</span>
-                <span>拖拽上传，操作简单</span>
+            <div class="demo-step">
+              <div class="step-number">2</div>
+              <div class="step-content">
+                <h4>自动处理</h4>
+                <p>系统自动上传并配置您的文件到全球CDN网络</p>
               </div>
-              <div class="feature-item">
-                <span class="check-icon">✓</span>
-                <span>秒级生成访问链接</span>
-              </div>
-              <div class="feature-item">
-                <span class="check-icon">✓</span>
-                <span>支持HTML、CSS、JS等文件</span>
-              </div>
-              <div class="feature-item">
-                <span class="check-icon">✓</span>
-                <span>全球CDN加速访问</span>
+            </div>
+            <div class="demo-step">
+              <div class="step-number">3</div>
+              <div class="step-content">
+                <h4>获得链接</h4>
+                <p>立即获得永久访问链接，可以分享给任何人</p>
               </div>
             </div>
           </div>
-          <div class="modal-footer">
-            <button class="modal-btn secondary" @click="closeUploadModal">稍后再说</button>
-            <button class="modal-btn primary" @click="goToControl">立即开始</button>
+          <div class="demo-example">
+            <div class="example-url">
+              <Globe class="url-icon" />
+              <span>https://html.lingxiao.com/your-project</span>
+              <button class="copy-btn">
+                <Copy />
+              </button>
+            </div>
           </div>
         </div>
-      </div>
-
-      <!-- 多端兼容弹窗 -->
-      <div v-if="showDetailsModal" class="modal-overlay" @click="closeDetailsModal">
-        <div class="modal-content" @click.stop>
-          <button class="modal-close" @click="closeDetailsModal">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            </svg>
+        <div class="modal-footer">
+          <button class="demo-start-btn" @click="startDemo">
+            立即体验
           </button>
-          <div class="modal-header">
-            <div class="modal-icon">
-              <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-                <circle cx="24" cy="24" r="20" stroke="#22c55e" stroke-width="3"/>
-                <path d="M16 24h16M24 16v16" stroke="#22c55e" stroke-width="3" stroke-linecap="round"/>
-              </svg>
-            </div>
-            <h2>多端完美兼容</h2>
-          </div>
-          <div class="modal-body">
-            <p class="modal-description">
-              您的网页将在所有设备上完美展示，无需额外配置
-            </p>
-            <div class="device-grid">
-              <div class="device-item">
-                <div class="device-icon">💻</div>
-                <div class="device-name">桌面电脑</div>
-                <div class="device-desc">完整功能体验</div>
-              </div>
-              <div class="device-item">
-                <div class="device-icon">📱</div>
-                <div class="device-name">智能手机</div>
-                <div class="device-desc">触屏优化界面</div>
-              </div>
-              <div class="device-item">
-                <div class="device-icon">📟</div>
-                <div class="device-name">平板电脑</div>
-                <div class="device-desc">自适应布局</div>
-              </div>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button class="modal-btn primary full-width" @click="closeDetailsModal">我知道了</button>
-          </div>
         </div>
       </div>
-
-      <!-- 永久免费弹窗 -->
-      <div v-if="showPolicyModal" class="modal-overlay" @click="closePolicyModal">
-        <div class="modal-content" @click.stop>
-          <button class="modal-close" @click="closePolicyModal">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-            </svg>
-          </button>
-          <div class="modal-header">
-            <div class="modal-icon">
-              <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-                <rect x="12" y="12" width="24" height="24" rx="6" stroke="#22c55e" stroke-width="3"/>
-                <path d="M18 24h12" stroke="#22c55e" stroke-width="3" stroke-linecap="round"/>
-              </svg>
-            </div>
-            <h2>永久免费承诺</h2>
-          </div>
-          <div class="modal-body">
-            <p class="modal-description">
-              我们承诺为所有用户提供永久免费的基础服务
-            </p>
-            <div class="policy-list">
-              <div class="policy-item">
-                <span class="policy-icon">🎯</span>
-                <div class="policy-content">
-                  <div class="policy-title">基础功能永久免费</div>
-                  <div class="policy-desc">HTML托管、链接生成等核心功能</div>
-                </div>
-              </div>
-              <div class="policy-item">
-                <span class="policy-icon">🚫</span>
-                <div class="policy-content">
-                  <div class="policy-title">无隐藏费用</div>
-                  <div class="policy-desc">透明收费，绝无额外隐藏费用</div>
-                </div>
-              </div>
-              <div class="policy-item">
-                <span class="policy-icon">♾️</span>
-                <div class="policy-content">
-                  <div class="policy-title">不限制网页数量</div>
-                  <div class="policy-desc">可托管任意数量的网页项目</div>
-                </div>
-              </div>
-              <div class="policy-item">
-                <span class="policy-icon">🔄</span>
-                <div class="policy-content">
-                  <div class="policy-title">持续更新优化</div>
-                  <div class="policy-desc">定期更新功能，优化用户体验</div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button class="modal-btn primary full-width" @click="closePolicyModal">太棒了！</button>
-          </div>
-        </div>
-      </div>
-    </Teleport>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { 
+  Zap, Upload, Eye, Globe, Clock, Shield, Server, Rocket, 
+  ArrowRight, Play, X, Copy, FileText, Image, Code, Palette
+} from 'lucide-vue-next'
 
 const router = useRouter()
+const showDemoModal = ref(false)
 
-// 响应式数据
-const showUploadModal = ref(false)
-const showDetailsModal = ref(false)
-const showPolicyModal = ref(false)
-
-// 静态数据
-const features = [
+// 核心功能数据
+const features = ref([
   {
-    svg: `<svg width="40" height="40" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="18" stroke="#22c55e" stroke-width="3"/><polyline points="20,8 20,20 28,24" stroke="#22c55e" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-    title: "秒速上线",
-    desc: "上传即刻生成专属链接，网页立刻对外开放。"
+    id: 1,
+    icon: Zap,
+    title: '极速上线',
+    description: '上传文件后3秒内即可生成全球访问链接，无需等待任何配置过程',
+    highlight: '3秒极速部署'
   },
   {
-    svg: `<svg width="40" height="40" viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="18" stroke="#22c55e" stroke-width="3"/><ellipse cx="20" cy="20" rx="10" ry="18" stroke="#22c55e" stroke-width="3" fill="none"/><line x1="2" y1="20" x2="38" y2="20" stroke="#22c55e" stroke-width="3"/></svg>`,
-    title: "全球互通",
-    desc: "无论身处何地，您的网页都能极速访问。"
+    id: 2,
+    icon: Globe,
+    title: '全球访问',
+    description: '基于全球CDN网络，确保您的HTML页面在世界任何地方都能快速加载',
+    highlight: '全球CDN加速'
   },
   {
-    svg: `<svg width="40" height="40" viewBox="0 0 40 40" fill="none"><rect x="8" y="12" width="24" height="16" rx="4" stroke="#22c55e" stroke-width="3"/><path d="M12 20l6 6 10-10" stroke="#22c55e" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-    title: "安全守护",
-    desc: "数据加密存储，隐私与安全双重保障。"
+    id: 3,
+    icon: Server,
+    title: '无需服务器',
+    description: '告别复杂的服务器购买、配置和维护，专注于您的内容创作',
+    highlight: '零运维成本'
   },
   {
-    svg: `<svg width="40" height="40" viewBox="0 0 40 40" fill="none"><rect x="8" y="8" width="24" height="24" rx="6" stroke="#22c55e" stroke-width="3"/><path d="M16 20h8M20 16v8" stroke="#22c55e" stroke-width="3" stroke-linecap="round"/></svg>`,
-    title: "零门槛操作",
-    desc: "无需技术背景，界面友好，人人都能用。"
+    id: 4,
+    icon: Shield,
+    title: '安全稳定',
+    description: 'SSL加密传输，企业级安全防护，99.9%稳定运行保障',
+    highlight: '企业级安全'
+  },
+  {
+    id: 5,
+    icon: Upload,
+    title: '简单易用',
+    description: '拖拽上传，一键发布，无需任何技术背景即可轻松使用',
+    highlight: '零技术门槛'
+  },
+  {
+    id: 6,
+    icon: Clock,
+    title: '永久免费',
+    description: '核心功能永久免费，无隐藏费用，让您的创意不受限制',
+    highlight: '完全免费'
   }
-]
+])
 
-const cards = [
+// 工作流程步骤
+const workflowSteps = ref([
   {
-    svg: `<svg width="48" height="48" viewBox="0 0 48 48" fill="none"><rect x="8" y="12" width="32" height="24" rx="6" stroke="#22c55e" stroke-width="3"/><path d="M24 18v10M24 28l-4-4m4 4l4-4" stroke="#22c55e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-    title: "极速托管",
-    desc: "一键上传HTML文件，立即获得绿色专属访问通道。",
-    btn: "立即体验",
-    btnClass: "btn-green"
+    icon: Upload,
+    title: '上传HTML文件',
+    description: '选择您的HTML文件及相关资源，支持拖拽上传'
   },
   {
-    svg: `<svg width="48" height="48" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="20" stroke="#22c55e" stroke-width="3"/><path d="M16 24h16M24 16v16" stroke="#22c55e" stroke-width="3" stroke-linecap="round"/></svg>`,
-    title: "多端兼容",
-    desc: "支持PC与移动端，自动适配各种屏幕，体验无缝切换。",
-    btn: "了解详情",
-    btnClass: "btn-outline"
+    icon: Zap,
+    title: '自动部署',
+    description: '系统自动处理并部署到全球CDN网络'
   },
   {
-    svg: `<svg width="48" height="48" viewBox="0 0 48 48" fill="none"><rect x="12" y="12" width="24" height="24" rx="6" stroke="#22c55e" stroke-width="3"/><path d="M18 24h12" stroke="#22c55e" stroke-width="3" stroke-linecap="round"/></svg>`,
-    title: "永久免费",
-    desc: "所有基础功能永久免费，无隐藏费用，放心使用。",
-    btn: "查看政策",
-    btnClass: "btn-outline"
+    icon: Globe,
+    title: '获得链接',
+    description: '立即获得永久访问链接，可随时分享'
   }
-]
+])
 
-const steps = [
-  { title: "上传文件", desc: "选择或拖拽HTML及相关资源，轻松上传。" },
-  { title: "获取链接", desc: "系统自动生成绿色专属访问地址。" },
-  { title: "一键分享", desc: "将链接分发给好友或社群，随时管理。" }
-]
+// 支持的文件类型
+const fileTypes = ref([
+  {
+    name: 'HTML',
+    description: '网页主文件',
+    icon: FileText,
+    color: '#22c55e'
+  },
+  {
+    name: 'CSS',
+    description: '样式文件',
+    icon: Palette,
+    color: '#3b82f6'
+  },
+  {
+    name: 'JavaScript',
+    description: '脚本文件',
+    icon: Code,
+    color: '#f59e0b'
+  }
+])
 
 // 方法
-const handleCardClick = (cardTitle) => {
-  switch(cardTitle) {
-    case '极速托管':
-      showUploadModal.value = true
-      break
-    case '多端兼容':
-      showDetailsModal.value = true
-      break
-    case '永久免费':
-      showPolicyModal.value = true
-      break
-  }
-}
-
-const closeUploadModal = () => {
-  showUploadModal.value = false
-}
-
-const closeDetailsModal = () => {
-  showDetailsModal.value = false
-}
-
-const closePolicyModal = () => {
-  showPolicyModal.value = false
-}
-
-const goToControl = () => {
-  showUploadModal.value = false
-  // 跳转到控制页面
+const quickStart = () => {
   router.push('/control')
 }
 
-// 键盘事件处理
-const handleKeydown = (event) => {
-  if (event.key === 'Escape') {
-    showUploadModal.value = false
-    showDetailsModal.value = false
-    showPolicyModal.value = false
-  }
+const viewDemo = () => {
+  showDemoModal.value = true
 }
 
-// 生命周期
-onMounted(() => {
-  document.addEventListener('keydown', handleKeydown)
-})
+const closeDemoModal = () => {
+  showDemoModal.value = false
+}
 
-onUnmounted(() => {
-  document.removeEventListener('keydown', handleKeydown)
+const startDemo = () => {
+  showDemoModal.value = false
+  router.push('/control')
+}
+
+const getStarted = () => {
+  router.push('/control')
+}
+
+// 动画效果
+onMounted(() => {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('animate-in')
+      }
+    })
+  })
+
+  document.querySelectorAll('.feature-card, .step-item, .tech-card, .file-type-item').forEach(el => {
+    observer.observe(el)
+  })
 })
 </script>
 
 <style scoped>
-.home-hero {
-  background: #f8fafc;
+/* 全局样式 */
+.html-proxy-hero {
   min-height: 100vh;
-  padding-top: 2.5rem;
-  font-family: 'Inter', 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);
+  color: #1e293b;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  position: relative;
+  overflow-x: hidden;
 }
 
-.container {
-  max-width: 1100px;
+/* 背景网格 */
+.bg-grid {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    linear-gradient(rgba(34, 197, 94, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34, 197, 94, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* 主容器 */
+.hero-container {
+  position: relative;
+  z-index: 1;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 0 1.5rem;
+  padding: 0 2rem;
 }
 
-.main-title {
-  font-size: 2.4rem;
-  font-weight: 800;
-  color: #1a3a2a;
+/* 英雄区域 */
+.hero-section {
   text-align: center;
-  margin-bottom: 0.5rem;
-  letter-spacing: 2px;
+  padding: 6rem 0 4rem;
 }
 
-.sub-title {
-  font-size: 1.3rem;
-  color: #22c55e;
-  text-align: center;
-  margin-bottom: 1.2rem;
-  font-weight: 600;
-}
-
-.desc {
-  text-align: center;
-  color: #4b5563;
-  font-size: 1.1rem;
-  margin-bottom: 2.2rem;
-}
-
-.features {
-  display: flex;
-  justify-content: space-between;
-  gap: 1.5rem;
-  margin-bottom: 2.5rem;
-  flex-wrap: wrap;
-}
-
-.feature {
-  flex: 1 1 180px;
-  background: #fff;
-  border-radius: 1rem;
-  box-shadow: 0 2px 10px rgba(34,197,94,0.07);
-  padding: 1.2rem 0.8rem;
-  text-align: center;
-  transition: box-shadow 0.2s, transform 0.2s;
-}
-
-.feature:hover {
-  box-shadow: 0 8px 24px rgba(34,197,94,0.13);
-  transform: translateY(-4px) scale(1.03);
-}
-
-.feature-icon {
-  display: block;
-  margin: 0 auto 0.5rem;
-}
-
-.feature-title {
-  font-weight: 700;
-  color: #22c55e;
-  font-size: 1.1rem;
-  margin-bottom: 0.2rem;
-}
-
-.feature-desc {
-  color: #64748b;
-  font-size: 0.98rem;
-}
-
-.cards {
-  display: flex;
-  gap: 1.5rem;
-  margin-bottom: 2.5rem;
-  flex-wrap: wrap;
-}
-
-.service-card {
-  flex: 1 1 260px;
-  background: #fff;
-  border-radius: 1.2rem;
-  box-shadow: 0 2px 10px rgba(34,197,94,0.09);
-  padding: 2rem 1.2rem 1.5rem 1.2rem;
-  text-align: center;
-  transition: box-shadow 0.2s, transform 0.2s;
-  display: flex;
-  flex-direction: column;
+.hero-badge {
+  display: inline-flex;
   align-items: center;
-}
-
-.service-card:hover {
-  box-shadow: 0 8px 24px rgba(34,197,94,0.15);
-  transform: translateY(-4px) scale(1.03);
-}
-
-.card-icon {
-  margin-bottom: 1rem;
-}
-
-.card-title {
-  font-weight: 700;
-  color: #1a3a2a;
-  font-size: 1.15rem;
-  margin-bottom: 0.5rem;
-}
-
-.card-desc {
-  color: #64748b;
-  font-size: 1rem;
-  margin-bottom: 1.2rem;
-}
-
-.card-btn {
-  padding: 0.5rem 1.5rem;
+  gap: 0.5rem;
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  padding: 0.5rem 1rem;
   border-radius: 2rem;
+  font-size: 0.9rem;
   font-weight: 600;
-  font-size: 1rem;
+  color: #22c55e;
+  margin-bottom: 2rem;
+}
+
+.badge-icon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.hero-title {
+  font-size: clamp(3rem, 8vw, 5rem);
+  font-weight: 900;
+  line-height: 1.1;
+  margin-bottom: 1.5rem;
+  letter-spacing: -0.02em;
+}
+
+.main-text {
+  color: #1e293b;
+}
+
+.highlight-text {
+  color: #22c55e;
+  position: relative;
+}
+
+.highlight-text::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, #22c55e, #16a34a);
+  border-radius: 2px;
+}
+
+.hero-subtitle {
+  font-size: 1.25rem;
+  line-height: 1.6;
+  color: #64748b;
+  max-width: 800px;
+  margin: 0 auto 3rem;
+}
+
+.hero-subtitle strong {
+  color: #22c55e;
+  font-weight: 700;
+}
+
+/* 按钮样式 */
+.hero-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 4rem;
+  flex-wrap: wrap;
+}
+
+.primary-btn, .secondary-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 2rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  font-size: 1.1rem;
   border: none;
   cursor: pointer;
-  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+  transition: all 0.3s ease;
+  text-decoration: none;
 }
 
-.btn-green {
-  background: #22c55e;
-  color: #fff;
+.primary-btn {
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  color: white;
+  box-shadow: 0 10px 25px rgba(34, 197, 94, 0.3);
 }
 
-.btn-green:hover {
-  background: #16a34a;
+.primary-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 35px rgba(34, 197, 94, 0.4);
 }
 
-.btn-outline {
-  background: #fff;
+.secondary-btn {
+  background: white;
   color: #22c55e;
   border: 2px solid #22c55e;
 }
 
-.btn-outline:hover {
+.secondary-btn:hover {
   background: #22c55e;
-  color: #fff;
+  color: white;
+  transform: translateY(-2px);
 }
 
-.steps-title {
-  text-align: center;
-  font-size: 1.2rem;
-  color: #1a3a2a;
-  font-weight: 700;
-  margin-bottom: 1.2rem;
-  margin-top: 2.5rem;
-  letter-spacing: 1px;
+.btn-icon {
+  width: 1.25rem;
+  height: 1.25rem;
 }
 
-.steps {
+/* 统计栏 */
+.stats-bar {
   display: flex;
-  justify-content: space-between;
-  gap: 1.5rem;
-  margin-bottom: 2.5rem;
+  justify-content: center;
+  gap: 3rem;
   flex-wrap: wrap;
 }
 
-.step {
-  flex: 1 1 180px;
-  background: #f0fdf4;
-  border-radius: 1rem;
-  padding: 1.2rem 0.8rem;
-  text-align: center;
-  box-shadow: 0 2px 8px rgba(34,197,94,0.06);
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-.step-circle {
-  width: 44px;
-  height: 44px;
-  background: #22c55e;
-  color: #fff;
-  border-radius: 50%;
+.stat-icon {
+  width: 2rem;
+  height: 2rem;
+  color: #22c55e;
+}
+
+.stat-number {
   font-size: 1.5rem;
   font-weight: 700;
+  color: #1e293b;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
+/* 功能区域 */
+.features-section {
+  padding: 4rem 0;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.section-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  color: #1e293b;
+}
+
+.section-subtitle {
+  font-size: 1.2rem;
+  color: #64748b;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 2rem;
+}
+
+.feature-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  padding: 2rem;
+  transition: all 0.3s ease;
+  opacity: 0;
+  transform: translateY(20px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.feature-card.animate-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(34, 197, 94, 0.3);
+  box-shadow: 0 20px 40px rgba(34, 197, 94, 0.1);
+}
+
+.feature-icon {
+  width: 3rem;
+  height: 3rem;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  border-radius: 0.75rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 0.6rem;
+  margin-bottom: 1.5rem;
+  color: white;
+}
+
+.feature-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #1e293b;
+}
+
+.feature-desc {
+  color: #64748b;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.feature-highlight {
+  display: inline-block;
+  background: rgba(34, 197, 94, 0.1);
+  color: #22c55e;
+  padding: 0.5rem 1rem;
+  border-radius: 2rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+/* 工作流程 */
+.workflow-section {
+  padding: 4rem 0;
+  background: white;
+  margin: 2rem 0;
+  border-radius: 2rem;
+}
+
+.workflow-steps {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.step-item {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  opacity: 0;
+  transform: translateX(-20px);
+  transition: all 0.5s ease;
+}
+
+.step-item.animate-in {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.step-number {
+  width: 3rem;
+  height: 3rem;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: white;
+  flex-shrink: 0;
+}
+
+.step-content {
+  text-align: center;
+  max-width: 200px;
+}
+
+.step-icon {
+  width: 2rem;
+  height: 2rem;
+  color: #22c55e;
+  margin: 0 auto 1rem;
 }
 
 .step-title {
-  font-weight: 700;
-  color: #1a3a2a;
-  font-size: 1.05rem;
-  margin-bottom: 0.2rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #1e293b;
 }
 
 .step-desc {
   color: #64748b;
-  font-size: 0.97rem;
+  font-size: 0.9rem;
+  line-height: 1.4;
 }
 
-.footer {
-  background: #22223b;
-  color: #fff;
-  border-radius: 1rem 1rem 0 0;
-  margin-top: 3rem;
-  padding: 2rem 0 1rem 0;
-  text-align: center;
-  font-size: 1rem;
-}
-
-.footer-links a {
+.step-connector {
   color: #22c55e;
-  margin: 0 0.5rem;
-  text-decoration: none;
-  font-size: 0.98rem;
 }
 
-.footer-links a:hover {
-  text-decoration: underline;
+.connector-icon {
+  width: 1.5rem;
+  height: 1.5rem;
 }
 
-.footer-copy {
-  color: #cbd5e1;
-  font-size: 0.95rem;
-  margin-top: 0.7rem;
+/* 技术优势 */
+.tech-section {
+  padding: 4rem 0;
 }
 
-/* 弹窗样式 */
+.tech-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.tech-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  padding: 2rem;
+  transition: all 0.3s ease;
+  opacity: 0;
+  transform: translateY(20px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.tech-card.animate-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.tech-card:hover {
+  border-color: rgba(34, 197, 94, 0.3);
+  transform: translateY(-3px);
+  box-shadow: 0 15px 30px rgba(34, 197, 94, 0.1);
+}
+
+.tech-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.tech-icon {
+  width: 2rem;
+  height: 2rem;
+  color: #22c55e;
+}
+
+.tech-header h3 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.tech-card p {
+  color: #64748b;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.tech-tags {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.tag {
+  background: rgba(34, 197, 94, 0.1);
+  color: #22c55e;
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+/* 文件类型支持 */
+.file-types-section {
+  padding: 4rem 0;
+  background: white;
+  margin: 2rem 0;
+  border-radius: 2rem;
+}
+
+.file-types-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+}
+
+.file-type-item {
+  text-align: center;
+  padding: 2rem 1rem;
+  border-radius: 1rem;
+  transition: all 0.3s ease;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.file-type-item.animate-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.file-type-item:hover {
+  transform: translateY(-5px);
+}
+
+.file-icon {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+  color: white;
+}
+
+.file-type-item h4 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #1e293b;
+}
+
+.file-type-item p {
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+/* 行动召唤 */
+.cta-section {
+  padding: 6rem 0;
+  text-align: center;
+}
+
+.cta-content {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 2rem;
+  padding: 4rem 2rem;
+  max-width: 600px;
+  margin: 0 auto;
+  box-shadow: 0 10px 25px rgba(34, 197, 94, 0.1);
+}
+
+.cta-icon {
+  width: 4rem;
+  height: 4rem;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 2rem;
+  color: white;
+}
+
+.cta-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  color: #1e293b;
+}
+
+.cta-subtitle {
+  font-size: 1.2rem;
+  color: #64748b;
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+.cta-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  color: white;
+  border: none;
+  padding: 1.25rem 2.5rem;
+  border-radius: 1rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 15px 35px rgba(34, 197, 94, 0.3);
+}
+
+.cta-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 20px 45px rgba(34, 197, 94, 0.4);
+}
+
+.btn-arrow {
+  width: 1.25rem;
+  height: 1.25rem;
+  transition: transform 0.3s ease;
+}
+
+.cta-button:hover .btn-arrow {
+  transform: translateX(3px);
+}
+
+.cta-note {
+  margin-top: 1.5rem;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+/* 演示弹窗 */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   z-index: 1000;
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(10px);
 }
 
-.modal-content {
-  position: relative;
+.demo-modal {
   background: white;
+  border: 1px solid #e2e8f0;
   border-radius: 1.5rem;
   max-width: 500px;
   width: 90%;
-  max-height: 80vh;
-  overflow-y: auto;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  animation: modalSlideIn 0.3s ease-out;
-}
-
-@keyframes modalSlideIn {
-  from {
-    opacity: 0;
-    transform: scale(0.9) translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-.modal-close {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background: #f3f4f6;
-  border: none;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: #6b7280;
-  transition: all 0.2s;
-  z-index: 10;
-}
-
-.modal-close:hover {
-  background: #e5e7eb;
-  color: #374151;
+  overflow: hidden;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
 }
 
 .modal-header {
-  text-align: center;
-  padding: 2rem 2rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 2rem;
+  border-bottom: 1px solid #e2e8f0;
+  position: relative;
 }
 
-.modal-icon {
-  margin-bottom: 1rem;
+.demo-avatar {
+  width: 3rem;
+  height: 3rem;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
 }
 
-.modal-header h2 {
-  color: #1f2937;
+.avatar-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.modal-header h3 {
   font-size: 1.5rem;
   font-weight: 700;
+  color: #1e293b;
   margin: 0;
 }
 
+.close-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.close-btn:hover {
+  background: #f1f5f9;
+  color: #1e293b;
+}
+
 .modal-body {
-  padding: 0 2rem 1rem;
+  padding: 2rem;
 }
 
-.modal-description {
-  color: #6b7280;
-  font-size: 1rem;
-  text-align: center;
-  margin-bottom: 1.5rem;
-  line-height: 1.6;
-}
-
-.feature-list {
+.demo-steps {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
 }
 
-.feature-item {
+.demo-step {
   display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.5rem;
-  background: #f9fafb;
-  border-radius: 0.5rem;
+  gap: 1rem;
+  align-items: flex-start;
 }
 
-.check-icon {
-  width: 20px;
-  height: 20px;
+.demo-step .step-number {
+  width: 2rem;
+  height: 2rem;
   background: #22c55e;
   color: white;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.75rem;
-  font-weight: bold;
-  flex-shrink: 0;
-}
-
-.device-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 1rem;
-  margin-top: 1rem;
-}
-
-.device-item {
-  text-align: center;
-  padding: 1rem;
-  background: #f9fafb;
-  border-radius: 0.75rem;
-}
-
-.device-icon {
-  font-size: 2rem;
-  margin-bottom: 0.5rem;
-}
-
-.device-name {
   font-weight: 600;
-  color: #1f2937;
-  margin-bottom: 0.25rem;
-}
-
-.device-desc {
-  font-size: 0.875rem;
-  color: #6b7280;
-}
-
-.policy-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.policy-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-  padding: 1rem;
-  background: #f9fafb;
-  border-radius: 0.75rem;
-}
-
-.policy-icon {
-  font-size: 1.5rem;
+  font-size: 0.9rem;
   flex-shrink: 0;
 }
 
-.policy-content {
+.demo-step .step-content h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0 0 0.5rem 0;
+}
+
+.demo-step .step-content p {
+  color: #64748b;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.demo-example {
+  background: #f8fafc;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  border: 1px solid #e2e8f0;
+}
+
+.example-url {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: white;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid #e2e8f0;
+}
+
+.url-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: #22c55e;
+  flex-shrink: 0;
+}
+
+.example-url span {
   flex: 1;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.9rem;
+  color: #1e293b;
 }
 
-.policy-title {
-  font-weight: 600;
-  color: #1f2937;
-  margin-bottom: 0.25rem;
+.copy-btn {
+  background: none;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  transition: all 0.2s ease;
 }
 
-.policy-desc {
-  font-size: 0.875rem;
-  color: #6b7280;
+.copy-btn:hover {
+  background: #f1f5f9;
+  color: #22c55e;
 }
 
 .modal-footer {
-  padding: 1rem 2rem 2rem;
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
+  padding: 2rem;
+  border-top: 1px solid #e2e8f0;
 }
 
-.modal-btn {
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.75rem;
-  font-weight: 600;
-  font-size: 1rem;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s;
-  min-width: 100px;
-}
-
-.modal-btn.primary {
-  background: #22c55e;
-  color: white;
-}
-
-.modal-btn.primary:hover {
-  background: #16a34a;
-}
-
-.modal-btn.secondary {
-  background: #f3f4f6;
-  color: #6b7280;
-}
-
-.modal-btn.secondary:hover {
-  background: #e5e7eb;
-  color: #374151;
-}
-
-.modal-btn.full-width {
+.demo-start-btn {
   width: 100%;
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 0.75rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-@media (max-width: 900px) {
-  .features, .cards, .steps {
+.demo-start-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(34, 197, 94, 0.3);
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .hero-container {
+    padding: 0 1rem;
+  }
+  
+  .hero-section {
+    padding: 4rem 0 3rem;
+  }
+  
+  .hero-actions {
     flex-direction: column;
-    gap: 1.2rem;
+    align-items: center;
   }
   
-  .modal-content {
-    width: 95%;
-    margin: 1rem;
+  .primary-btn, .secondary-btn {
+    width: 100%;
+    max-width: 300px;
+    justify-content: center;
   }
   
-  .modal-header, .modal-body, .modal-footer {
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
+  .stats-bar {
+    gap: 2rem;
   }
   
-  .device-grid {
+  .features-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .workflow-steps {
+    flex-direction: column;
+    gap: 3rem;
+  }
+  
+  .step-connector {
+    transform: rotate(90deg);
+  }
+  
+  .tech-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .file-types-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .cta-content {
+    padding: 3rem 1.5rem;
+  }
+  
+  .cta-title {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-title {
+    font-size: 2.5rem;
+  }
+  
+  .hero-subtitle {
+    font-size: 1.1rem;
+  }
+  
+  .section-title {
+    font-size: 2rem;
+  }
+  
+  .feature-card {
+    padding: 1.5rem;
+  }
+  
+  .file-types-grid {
     grid-template-columns: 1fr;
   }
 }

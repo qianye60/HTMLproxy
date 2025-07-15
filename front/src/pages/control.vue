@@ -1,69 +1,89 @@
 <template>
-    <div class="file-manager">
-      <!-- 用户头部区域 -->
-      <div class="header-section">
-        <div class="container">
-          <div class="header-content">
-            <div class="page-title">
-              <svg class="title-icon" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
-              </svg>
-              控制面板
+  <div class="file-manager">
+    <!-- 用户头部区域 -->
+    <div class="header-section">
+      <div class="container">
+        <div class="header-content">
+          <div class="page-title">
+            <LayoutDashboard class="title-icon" />
+            控制面板
+          </div>
+          <div class="user-profile">
+            <div class="user-avatar">
+              <User class="user-avatar-icon" />
             </div>
-            <div class="user-profile">
-              <div class="user-avatar">
-                <svg viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                </svg>
-              </div>
-              <div class="user-details">
-                <div class="username">{{ userStore.userInfo.username }}</div>
-                <div class="user-email">{{ userStore.userInfo.email }}</div>
-              </div>
-              <button class="logout-btn" @click="showLogoutConfirm = true" title="退出登录">
-                <svg viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M16,17V14H9V10H16V7L21,12L16,17M14,2A2,2 0 0,1 16,4V6H14V4H5V20H14V18H16V20A2,2 0 0,1 14,22H5A2,2 0 0,1 3,20V4A2,2 0 0,1 5,2H14Z"/>
-                </svg>
-                <span>退出</span>
-              </button>
+            <div class="user-details">
+              <div class="username">{{ userStore.userInfo.username }}</div>
+              <div class="user-email">{{ userStore.userInfo.email }}</div>
             </div>
+            <button class="logout-btn" @click="showLogoutConfirm = true" title="退出登录">
+              <LogOut class="logout-icon" />
+              <span>退出</span>
+            </button>
           </div>
         </div>
       </div>
-  
-      <!-- 统计卡片区域 -->
-      <div class="stats-section">
-        <div class="container">
-          <div class="stats-grid">
-            <div 
-              v-for="card in userStore.statCards" 
-              :key="card.id"
-              class="stat-card"
-            >
-              <div class="stat-icon" :style="{ backgroundColor: card.color, color: card.iconColor }">
-                <component :is="card.icon" />
-              </div>
-              <div class="stat-content">
-                <div class="stat-label">{{ card.label }}</div>
-                <div class="stat-value">{{ card.value }}</div>
-              </div>
-            </div>
-          </div>
+    </div>
+
+    <!-- 统计卡片区域 -->
+    <div class="stats-section">
+  <div class="container">
+    <div class="stats-grid">
+      <!-- 文件总数卡片 -->
+      <div class="stat-card">
+        <div class="stat-icon" style="background-color: #dbeafe; color: #3b82f6;">
+          <!-- 文件图标 SVG -->
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+            <rect x="4" y="4" width="16" height="16" rx="2" fill="#dbeafe"/>
+            <path d="M8 8h8M8 12h8M8 16h4" stroke="#3b82f6" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <div class="stat-label">文件总数</div>
+          <div class="stat-value">{{ userStore.statCards[0].value }}</div>
         </div>
       </div>
-  
-      <!-- 操作区域 -->
-      <div class="actions-section">
-        <div class="container">
+      <!-- 已用空间卡片 -->
+      <div class="stat-card">
+        <div class="stat-icon" style="background-color: #dcfce7; color: #10b981;">
+          <!-- 数据库/存储图标 SVG -->
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+            <ellipse cx="12" cy="6" rx="8" ry="3" fill="#dcfce7"/>
+            <ellipse cx="12" cy="6" rx="8" ry="3" stroke="#10b981" stroke-width="2"/>
+            <path d="M4 6v6c0 1.66 3.58 3 8 3s8-1.34 8-3V6" stroke="#10b981" stroke-width="2"/>
+            <path d="M4 12v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6" stroke="#10b981" stroke-width="2"/>
+          </svg>
+        </div>
+        <div class="stat-content">
+          <div class="stat-label">已用空间</div>
+          <div class="stat-value">{{ userStore.statCards[1].value }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <!-- 操作与拖拽上传区域 -->
+    <div class="actions-section">
+      <div class="container">
+        <div 
+          class="upload-area"
+          :class="{ 'drag-over': isDragOver }"
+          @dragover.prevent="isDragOver = true"
+          @dragleave.prevent="isDragOver = false"
+          @drop.prevent="handleDrop"
+        >
+          <div class="upload-icon-wrapper">
+            <UploadCloud class="upload-area-icon" />
+          </div>
+          <h3 class="upload-title">拖拽文件到这里，或点击按钮上传</h3>
           <div class="upload-buttons">
             <button 
               class="upload-btn"
               @click="handleUpload"
               :disabled="userStore.isUploading"
             >
-              <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
-              </svg>
+              <FileUp class="btn-icon" />
               {{ userStore.isUploading ? '上传中...' : '上传新文件' }}
             </button>
             <button 
@@ -71,1088 +91,1011 @@
               @click="showPasteModal = true"
               :disabled="userStore.isUploading"
             >
-              <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M19,20H5V4H7V7H17V4H19M12,2A1,1 0 0,1 13,3A1,1 0 0,1 12,4A1,1 0 0,1 11,3A1,1 0 0,1 12,2M19,2H14.82C14.4,0.84 13.3,0 12,0C10.7,0 9.6,0.84 9.18,2H5A2,2 0 0,0 3,4V20A2,2 0 0,0 5,22H19A2,2 0 0,0 21,20V4A2,2 0 0,0 19,2Z"/>
-              </svg>
+              <ClipboardPaste class="btn-icon" />
               粘贴HTML代码
             </button>
-          </div>
-        </div>
-      </div>
-  
-      <!-- 文件列表区域 -->
-      <div class="files-section">
-        <div class="container">
-          <div class="files-card">
-            <div class="card-header">
-              <h3 class="card-title">
-                <svg class="title-icon" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M6,2A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2H6Z"/>
-                </svg>
-                我的HTML文件
-              </h3>
-              <div class="file-count">共 {{ userStore.files.length }} 个文件</div>
-            </div>
-            
-            <div class="files-table-container">
-              <table class="files-table">
-                <thead>
-                  <tr>
-                    <th>项目名称</th>
-                    <th>文件名</th>
-                    <th>文件大小</th>
-                    <th>上传时间</th>
-                    <th>操作</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="file in userStore.files" :key="file.id" class="file-row">
-                    <!-- 项目名称列 -->
-                    <td class="project-name-cell">
-                      <div class="project-info">
-                        <div class="project-avatar">
-                          {{ file.projectName.charAt(0).toUpperCase() }}
-                        </div>
-                        <div v-if="!file.editing" class="project-name">
-                          {{ file.projectName }}
-                        </div>
-                        <input 
-                          v-else
-                          v-model="file.editProjectName"
-                          class="project-input"
-                          @keyup.enter="saveProjectName(file)"
-                          @keyup.esc="cancelEditProjectName(file)"
-                          @blur="saveProjectName(file)"
-                          ref="editInput"
-                        />
-                        <button 
-                          v-if="!file.editing"
-                          class="edit-btn"
-                          @click="editProjectName(file)"
-                          title="编辑项目名"
-                        >
-                          <svg viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z"/>
-                          </svg>
-                        </button>
-                      </div>
-                    </td>
-                    
-                    <!-- 文件名列 -->
-                    <td class="filename-cell">
-                      <a :href="getFileUrl(file.url)" target="_blank" class="file-link">
-                        <div class="file-icon">
-                          <svg viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
-                          </svg>
-                        </div>
-                        {{ file.filename }}
-                      </a>
-                    </td>
-                    
-                    <!-- 文件大小列 -->
-                    <td class="size-cell">
-                      <span class="size-badge">{{ file.size }}</span>
-                    </td>
-                    
-                    <!-- 上传时间列 -->
-                    <td class="time-cell">
-                      <span class="upload-time">{{ formatTime(file.uploadTime) }}</span>
-                    </td>
-                    
-                    <!-- 操作列 -->
-                    <td class="actions-cell">
-                      <div class="action-buttons">
-                        <a 
-                          :href="getFileUrl(file.url)" 
-                          target="_blank" 
-                          class="action-btn view-btn"
-                          title="查看文件"
-                        >
-                          <svg viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z"/>
-                          </svg>
-                        </a>
-                        <button 
-                          class="action-btn delete-btn"
-                          @click="deleteFile(file)"
-                          title="删除文件"
-                        >
-                          <svg viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z"/>
-                          </svg>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                  
-                  <!-- 空状态 -->
-                  <tr v-if="userStore.files.length === 0" class="empty-row">
-                    <td colspan="5" class="empty-cell">
-                      <div class="empty-state">
-                        <svg class="empty-icon" viewBox="0 0 24 24" fill="currentColor">
-                          <path d="M13,9H18.5L13,3.5V9M6,2H14L20,8V20A2,2 0 0,1 18,22H6C4.89,22 4,21.1 4,20V4C4,2.89 4.89,2 6,2M15,18V16H6V18H15M18,14V12H6V14H18Z"/>
-                        </svg>
-                        <p>暂无文件，点击上方按钮上传您的第一个文件</p>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <!-- HTML代码粘贴弹窗 -->
-      <div v-if="showPasteModal" class="modal-overlay" @click="closePasteModal">
-        <div class="modal-content" @click.stop>
-          <div class="modal-header">
-            <h3 class="modal-title">
-              <svg class="modal-icon" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M19,20H5V4H7V7H17V4H19M12,2A1,1 0 0,1 13,3A1,1 0 0,1 12,4A1,1 0 0,1 11,3A1,1 0 0,1 12,2M19,2H14.82C14.4,0.84 13.3,0 12,0C10.7,0 9.6,0.84 9.18,2H5A2,2 0 0,0 3,4V20A2,2 0 0,0 5,22H19A2,2 0 0,0 21,20V4A2,2 0 0,0 19,2Z"/>
-              </svg>
-              粘贴HTML代码
-            </h3>
-            <button class="close-btn" @click="closePasteModal">
-              <svg viewBox="0 0 24 24" fill="currentColor">
-                <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
-              </svg>
-            </button>
-          </div>
-          <div class="modal-body">
-            <div class="form-group">
-              <label for="project-name">项目名称</label>
-              <input 
-                id="project-name"
-                v-model="pasteForm.projectName"
-                type="text"
-                placeholder="请输入项目名称"
-                class="form-input"
-              />
-            </div>
-            <div class="form-group">
-              <label for="html-code">HTML代码</label>
-              <textarea 
-                id="html-code"
-                v-model="pasteForm.htmlCode"
-                placeholder="请粘贴您的HTML代码..."
-                class="form-textarea"
-                rows="12"
-              ></textarea>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button class="cancel-btn" @click="closePasteModal">取消</button>
-            <button 
-              class="submit-btn"
-              @click="handlePasteUpload"
-              :disabled="!pasteForm.projectName.trim() || !pasteForm.htmlCode.trim() || userStore.isUploading"
-            >
-              {{ userStore.isUploading ? '上传中...' : '上传' }}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- 退出确认弹窗 -->
-      <div v-if="showLogoutConfirm" class="dialog-mask">
-        <div class="dialog">
-          <h3>确认退出登录？</h3>
-          <div class="dialog-actions">
-            <button @click="confirmLogout" class="dialog-btn danger">确定</button>
-            <button @click="showLogoutConfirm = false" class="dialog-btn">取消</button>
           </div>
         </div>
       </div>
     </div>
-  </template>
-  
-  <script setup lang="ts">
-  import { ref, nextTick, onMounted } from 'vue'
-  import { useUserStore } from '@/stores/user'
-  import { useRouter } from 'vue-router'
 
-  // 处理文件URL，确保在生产环境中使用正确的端口
-  const getFileUrl = (url: string): string => {
-    // 调试信息
-    console.log('原始URL:', url)
-    console.log('当前location:', {
-      protocol: window.location.protocol,
-      hostname: window.location.hostname,
-      port: window.location.port,
-      origin: window.location.origin
-    })
+    <!-- 文件列表区域 -->
+    <div class="files-section">
+      <div class="container">
+        <div class="files-card">
+          <div class="card-header">
+            <h3 class="card-title">
+              <List class="title-icon" />
+              我的HTML文件
+            </h3>
+            <div class="file-count">共 {{ userStore.files.length }} 个文件</div>
+          </div>
+          
+          <div class="files-table-container">
+            <table class="files-table">
+              <thead>
+                <tr>
+                  <th>项目名称</th>
+                  <th>文件名</th>
+                  <th>文件大小</th>
+                  <th>上传时间</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="file in userStore.files" :key="file.id" class="file-row">
+                  <td class="project-name-cell">
+                    <div class="project-info">
+                      <div class="project-avatar">
+                        {{ file.projectName.charAt(0).toUpperCase() }}
+                      </div>
+                      <div v-if="!file.editing" class="project-name">
+                        {{ file.projectName }}
+                      </div>
+                      <input 
+                        v-else
+                        v-model="file.editProjectName"
+                        class="project-input"
+                        @keyup.enter="saveProjectName(file)"
+                        @keyup.esc="cancelEditProjectName(file)"
+                        @blur="saveProjectName(file)"
+                        ref="editInput"
+                      />
+                      <button 
+                        v-if="!file.editing"
+                        class="edit-btn"
+                        @click="editProjectName(file)"
+                        title="编辑项目名"
+                      >
+                        <Pencil class="edit-icon" />
+                      </button>
+                    </div>
+                  </td>
+                  
+                  <td class="filename-cell">
+                    <a :href="getFileUrl(file.url)" target="_blank" class="file-link">
+                      <FileText class="file-icon" />
+                      {{ file.filename }}
+                    </a>
+                  </td>
+                  
+                  <td class="size-cell">
+                    <span class="size-badge">{{ file.size }}</span>
+                  </td>
+                  
+                  <td class="time-cell">
+                    <span class="upload-time">{{ formatTime(file.uploadTime) }}</span>
+                  </td>
+                  
+                  <td class="actions-cell">
+                    <div class="action-buttons">
+                      <a 
+                        :href="getFileUrl(file.url)" 
+                        target="_blank" 
+                        class="action-btn view-btn"
+                        title="查看文件"
+                      >
+                        <ExternalLink class="action-icon" />
+                      </a>
+                      <button 
+                        class="action-btn delete-btn"
+                        @click="deleteFile(file)"
+                        title="删除文件"
+                      >
+                        <Trash2 class="action-icon" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                
+                <tr v-if="userStore.files.length === 0" class="empty-row">
+                  <td colspan="5" class="empty-cell">
+                    <div class="empty-state">
+                      <FolderOpen class="empty-icon" />
+                      <p>暂无文件，点击上方按钮上传您的第一个文件</p>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
     
-    // 如果URL已经是完整的绝对路径，直接返回
-    if (url.startsWith('http://') || url.startsWith('https://')) {
-      console.log('完整URL，直接返回:', url)
-      return url
-    }
-    
-    // 如果是相对路径且当前页面是通过40000端口访问的，重定向到8080端口
-    if (url.startsWith('/html/') && window.location.port === '40000') {
-      const newUrl = window.location.protocol + '//' + window.location.hostname + ':8080' + url
-      console.log('重定向到nginx端口:', newUrl)
-      return newUrl
-    }
-    
-    // 默认情况下直接返回相对路径，让浏览器基于当前页面解析
-    console.log('使用相对路径:', url)
-    return url
+    <!-- HTML代码粘贴弹窗 -->
+    <div v-if="showPasteModal" class="modal-overlay" @click="closePasteModal">
+      <div class="modal-content" @click.stop>
+        <div class="modal-header">
+          <h3 class="modal-title">
+            <ClipboardPaste class="modal-icon" />
+            粘贴HTML代码
+          </h3>
+          <button class="close-btn" @click="closePasteModal">
+            <X class="close-icon" />
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="project-name">项目名称</label>
+            <input 
+              id="project-name"
+              v-model="pasteForm.projectName"
+              type="text"
+              placeholder="请输入项目名称"
+              class="form-input"
+            />
+          </div>
+          <div class="form-group">
+            <label for="html-code">HTML代码</label>
+            <textarea 
+              id="html-code"
+              v-model="pasteForm.htmlCode"
+              placeholder="请粘贴您的HTML代码..."
+              class="form-textarea"
+              rows="12"
+            ></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="cancel-btn" @click="closePasteModal">取消</button>
+          <button 
+            class="submit-btn"
+            @click="handlePasteUpload"
+            :disabled="!pasteForm.projectName.trim() || !pasteForm.htmlCode.trim() || userStore.isUploading"
+          >
+            {{ userStore.isUploading ? '上传中...' : '上传' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 退出确认弹窗 -->
+    <div v-if="showLogoutConfirm" class="dialog-mask">
+      <div class="dialog">
+        <h3>确认退出登录？</h3>
+        <div class="dialog-actions">
+          <button @click="confirmLogout" class="dialog-btn danger">确定</button>
+          <button @click="showLogoutConfirm = false" class="dialog-btn">取消</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, nextTick, onMounted } from 'vue'
+import { useUserStore } from '@/stores/user'
+import { useRouter } from 'vue-router'
+import { 
+  LayoutDashboard, User, LogOut, FileUp, ClipboardPaste, List, 
+  Pencil, FileText, ExternalLink, Trash2, FolderOpen, X, UploadCloud
+} from 'lucide-vue-next'
+
+const editInput = ref<HTMLInputElement[]>([])
+const userStore = useUserStore()
+const router = useRouter()
+const isDragOver = ref(false)
+
+// 粘贴弹窗相关
+const showPasteModal = ref(false)
+const pasteForm = ref({
+  projectName: '',
+  htmlCode: ''
+})
+
+// 退出确认弹窗
+const showLogoutConfirm = ref(false)
+const confirmLogout = () => {
+  showLogoutConfirm.value = false
+  handleLogout()
+}
+
+// 页面加载时自动初始化数据
+onMounted(async () => {
+  const loginStatus = await userStore.checkLoginStatus()
+  if (loginStatus.islogin) {
+    await userStore.initializeData()
   }
+})
 
-  const editInput = ref<HTMLInputElement[]>([])
-  const userStore = useUserStore()
-  const router = useRouter()
+// 工具函数
+const formatTime = (timeStr: string): string => {
+  const date = new Date(timeStr)
+  const now = new Date()
+  const diff = now.getTime() - date.getTime()
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+  if (days === 0) return '今天'
+  if (days === 1) return '昨天'
+  if (days < 7) return `${days}天前`
+  return timeStr.split(' ')[0]
+}
 
-  // 粘贴弹窗相关
-  const showPasteModal = ref(false)
-  const pasteForm = ref({
+const handleDrop = (event: DragEvent) => {
+  isDragOver.value = false;
+  const file = event.dataTransfer?.files[0];
+  if (file) {
+    uploadFileFlow(file);
+  }
+};
+
+const uploadFileFlow = async (file: File) => {
+  if (userStore.isUploading) return;
+  try {
+    userStore.isUploading = true
+    await userStore.uploadFile(file)
+  } catch (err) {
+    alert('上传失败，请重试')
+  } finally {
+    userStore.isUploading = false
+  }
+}
+
+// 上传文件
+const handleUpload = async () => {
+  const input = document.createElement('input')
+  input.type = 'file'
+  input.accept = '.html,.htm'
+  input.onchange = async (e) => {
+    const file = (e.target as HTMLInputElement).files?.[0]
+    if (file) {
+      await uploadFileFlow(file)
+    }
+  }
+  input.click()
+}
+
+// 编辑项目名
+const editProjectName = async (file: any) => {
+  file.editing = true
+  file.editProjectName = file.projectName
+  await nextTick()
+  const input = editInput.value?.find(el => el)
+  input?.focus()
+}
+
+const saveProjectName = async (file: any) => {
+  if (!file.editing) return;
+  if (!file.editProjectName.trim()) {
+    alert('项目名不能为空')
+    return
+  }
+  try {
+    const success = await userStore.updateProjectName(file.id, file.editProjectName.trim())
+    if (success) {
+      file.projectName = file.editProjectName.trim()
+      file.editing = false
+    } else {
+      throw new Error('更新失败')
+    }
+  } catch (error) {
+    alert('更新失败，请重试')
+  }
+}
+
+const cancelEditProjectName = (file: any) => {
+  file.editing = false
+  file.editProjectName = ''
+}
+
+const deleteFile = async (file: any) => {
+  if (!confirm(`确定要删除文件 "${file.filename}" 吗？删除后不可恢复`)) {
+    return
+  }
+  try {
+    await userStore.deleteFile(file.id)
+  } catch (error) {
+    alert('删除失败，请重试')
+  }
+}
+
+// 粘贴弹窗相关功能
+const closePasteModal = () => {
+  showPasteModal.value = false
+  pasteForm.value = {
     projectName: '',
     htmlCode: ''
-  })
-
-  // 退出确认弹窗
-  const showLogoutConfirm = ref(false)
-  const confirmLogout = () => {
-    showLogoutConfirm.value = false
-    handleLogout()
   }
+}
 
-  // 页面加载时自动初始化数据
-  onMounted(async () => {
-    const loginStatus = await userStore.checkLoginStatus()
-    if (loginStatus.islogin) {
-      await userStore.initializeData()
-    }
-  })
-
-  // 工具函数
-  const formatTime = (timeStr: string): string => {
-    const date = new Date(timeStr)
-    const now = new Date()
-    const diff = now.getTime() - date.getTime()
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24))
-    if (days === 0) return '今天'
-    if (days === 1) return '昨天'
-    if (days < 7) return `${days}天前`
-    return timeStr.split(' ')[0]
-  }
-
-  // 上传文件
-  const handleUpload = async () => {
-    try {
-      userStore.isUploading = true
-      const input = document.createElement('input')
-      input.type = 'file'
-      input.accept = '.html,.htm'
-      input.onchange = async (e) => {
-        const file = (e.target as HTMLInputElement).files?.[0]
-        if (file) {
-          try {
-            await userStore.uploadFile(file)
-          } catch (err) {
-            alert('上传失败，请重试')
-          }
-        }
-      }
-      input.click()
-    } finally {
-      userStore.isUploading = false
-    }
-  }
-
-  // 编辑项目名
-  const editProjectName = async (file: any) => {
-    file.editing = true
-    file.editProjectName = file.projectName
-    await nextTick()
-    const input = editInput.value?.find(el => el)
-    input?.focus()
-  }
-
-  const saveProjectName = async (file: any) => {
-    if (!file.editProjectName.trim()) {
-      alert('项目名不能为空')
-      return
-    }
-    try {
-      const success = await userStore.updateProjectName(file.id, file.editProjectName.trim())
-      if (success) {
-        file.projectName = file.editProjectName.trim()
-        file.editing = false
-      } else {
-        throw new Error('更新失败')
-      }
-    } catch (error) {
-      alert('更新失败，请重试')
-    }
-  }
-
-  const cancelEditProjectName = (file: any) => {
-    file.editing = false
-    file.editProjectName = ''
-  }
-
-  const deleteFile = async (file: any) => {
-    if (!confirm(`确定要删除文件 "${file.filename}" 吗？删除后不可恢复`)) {
-      return
-    }
-    try {
-      await userStore.deleteFile(file.id)
-    } catch (error) {
-      alert('删除失败，请重试')
-    }
-  }
-
-  // 粘贴弹窗相关功能
-  const closePasteModal = () => {
-    showPasteModal.value = false
-    pasteForm.value = {
-      projectName: '',
-      htmlCode: ''
-    }
-  }
-
-  const handlePasteUpload = async () => {
-    if (!pasteForm.value.projectName.trim() || !pasteForm.value.htmlCode.trim()) {
-      alert('请填写项目名称和HTML代码')
-      return
-    }
-    
-    try {
-      userStore.isUploading = true
-      
-      // 创建一个Blob对象来模拟文件
-      const blob = new Blob([pasteForm.value.htmlCode], { type: 'text/html' })
-      const file = new File([blob], `${pasteForm.value.projectName}.html`, { type: 'text/html' })
-      
-      await userStore.uploadFile(file)
-      closePasteModal()
-      
-    } catch (error) {
-      alert('上传失败，请重试')
-    } finally {
-      userStore.isUploading = false
-    }
-  }
-
-  const handleLogout = () => {
-    userStore.logout();
-    router.push('/login');
-  }
-
-  // 组件图标
-  const FileIcon = {
-    template: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/></svg>`
-  }
-  const StorageIcon = {
-    template: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6,2H18A2,2 0 0,1 20,4V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V4A2,2 0 0,1 6,2M12,4A6,6 0 0,0 6,10C6,13.31 8.69,16 12.1,16L11.22,18.18C11.5,18.69 12.07,19 12.66,19H14.66C15.25,19 15.82,18.69 16.1,18.18L15.22,16C18.53,16 21.22,13.31 21.22,10A6,6 0 0,0 12,4Z"/></svg>`
-  }
-  </script>
-  
-  <style scoped>
-  /* 全局样式 */
-  .file-manager {
-    min-height: 100vh;
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+const handlePasteUpload = async () => {
+  if (!pasteForm.value.projectName.trim() || !pasteForm.value.htmlCode.trim()) {
+    alert('请填写项目名称和HTML代码')
+    return
   }
   
-  .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
+  const blob = new Blob([pasteForm.value.htmlCode], { type: 'text/html' })
+  const file = new File([blob], `${pasteForm.value.projectName}.html`, { type: 'text/html' })
+  await uploadFileFlow(file)
+  if (!userStore.isUploading) {
+    closePasteModal()
   }
-  
-  /* 头部区域 */
-  .header-section {
-    background: white;
-    border-bottom: 1px solid #e2e8f0;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+const handleLogout = () => {
+  userStore.logout();
+  router.push('/login');
+}
+
+// 处理文件URL，确保在生产环境中使用正确的端口
+const getFileUrl = (url: string): string => {
+  // 如果URL已经是完整的绝对路径，直接返回
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url
   }
-  
+  // 如果是相对路径且当前页面是通过40000端口访问的，重定向到8080端口
+  if (url.startsWith('/html/') && window.location.port === '40000') {
+    return window.location.protocol + '//' + window.location.hostname + ':8080' + url
+  }
+  // 默认情况下直接返回相对路径，让浏览器基于当前页面解析
+  return url
+}
+
+// 组件图标 (从您原有的代码中保留，以确保 userStore.statCards 能正常工作)
+const FileIcon = {
+  template: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/></svg>`
+}
+const StorageIcon = {
+  template: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6,2H18A2,2 0 0,1 20,4V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V4A2,2 0 0,1 6,2M12,4A6,6 0 0,0 6,10C6,13.31 8.69,16 12.1,16L11.22,18.18C11.5,18.69 12.07,19 12.66,19H14.66C15.25,19 15.82,18.69 16.1,18.18L15.22,16C18.53,16 21.22,13.31 21.22,10A6,6 0 0,0 12,4Z"/></svg>`
+}
+</script>
+
+<style scoped>
+/* 全局样式 */
+.file-manager {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* 头部区域 */
+.header-section {
+  background: white;
+  border-bottom: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(8px);
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0;
+}
+
+.page-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 24px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.title-icon {
+  width: 28px;
+  height: 28px;
+  color: #3b82f6;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  background: #dbeafe;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #3b82f6;
+}
+
+.user-avatar-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.username {
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 16px;
+}
+
+.user-email {
+  font-size: 14px;
+  color: #64748b;
+}
+
+.logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #fee2e2;
+  color: #ef4444;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.logout-btn:hover {
+  background: #fecaca;
+  color: #dc2626;
+}
+.logout-icon {
+  width: 16px;
+  height: 16px;
+}
+
+/* 统计区域 */
+.stats-section {
+  padding: 32px 0;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.05);
+}
+
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stat-icon :deep(svg) {
+  width: 24px;
+  height: 24px;
+}
+
+.stat-label {
+  font-size: 14px;
+  color: #64748b;
+  margin-bottom: 4px;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+/* 操作区域 */
+.actions-section {
+  padding: 0 0 32px 0;
+}
+
+.upload-area {
+  border: 2px dashed #cbd5e1;
+  border-radius: 1rem;
+  padding: 2rem;
+  text-align: center;
+  background-color: white;
+  transition: all 0.3s ease;
+}
+.upload-area.drag-over {
+  border-color: #3b82f6;
+  background-color: #eff6ff;
+}
+.upload-icon-wrapper {
+  width: 4rem;
+  height: 4rem;
+  background-color: #f1f5f9;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+}
+.upload-area-icon {
+  width: 2rem;
+  height: 2rem;
+  color: #64748b;
+}
+.upload-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 1rem;
+}
+
+.upload-btn, .paste-btn {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.3);
+}
+
+.upload-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px 0 rgba(59, 130, 246, 0.4);
+}
+
+.upload-btn:disabled, .paste-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.upload-buttons {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.paste-btn {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  box-shadow: 0 4px 14px 0 rgba(16, 185, 129, 0.3);
+}
+
+.paste-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px 0 rgba(16, 185, 129, 0.4);
+}
+
+/* 弹窗样式 (保持您原有的样式) */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+.modal-content {
+  background: white;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow: hidden;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+}
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px;
+  border-bottom: 1px solid #e2e8f0;
+  flex-shrink: 0;
+}
+.modal-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+}
+.modal-icon {
+  width: 24px;
+  height: 24px;
+  color: #10b981;
+}
+.close-btn {
+  background: none;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+.close-btn:hover {
+  background: #f1f5f9;
+  color: #1e293b;
+}
+.close-icon {
+  width: 20px;
+  height: 20px;
+}
+.modal-body {
+  padding: 24px;
+  overflow-y: auto;
+}
+.form-group {
+  margin-bottom: 20px;
+}
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #374151;
+}
+.form-input, .form-textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  box-sizing: border-box;
+}
+.form-input:focus, .form-textarea:focus {
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+}
+.form-textarea {
+  resize: vertical;
+  min-height: 240px;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  line-height: 1.5;
+}
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 24px;
+  border-top: 1px solid #e2e8f0;
+  background: #f8fafc;
+  flex-shrink: 0;
+}
+.cancel-btn {
+  background: white;
+  color: #64748b;
+  border: 1px solid #e2e8f0;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.cancel-btn:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+.submit-btn {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 14px 0 rgba(16, 185, 129, 0.39);
+}
+.submit-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 25px 0 rgba(16, 185, 129, 0.5);
+}
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 文件列表区域 (保持您原有的样式) */
+.files-section {
+  padding-bottom: 40px;
+}
+.files-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+}
+.card-header {
+  padding: 24px;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+}
+.file-count {
+  font-size: 14px;
+  color: #64748b;
+  background: #f1f5f9;
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+.files-table-container {
+  overflow-x: auto;
+}
+.files-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.files-table th {
+  background: #f8fafc;
+  padding: 16px 24px;
+  text-align: left;
+  font-weight: 600;
+  color: #475569;
+  font-size: 14px;
+  border-bottom: 1px solid #e2e8f0;
+}
+.file-row {
+  transition: background-color 0.2s;
+}
+.file-row:hover {
+  background: #f8fafc;
+}
+.files-table td {
+  padding: 16px 24px;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+.project-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.project-avatar {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  color: white;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.project-name {
+  font-weight: 500;
+  color: #1e293b;
+}
+.project-input {
+  border: 2px solid #3b82f6;
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 14px;
+  outline: none;
+  min-width: 120px;
+}
+.edit-btn {
+  background: none;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+.edit-btn:hover {
+  background: #f1f5f9;
+  color: #3b82f6;
+}
+.edit-icon {
+  width: 16px;
+  height: 16px;
+}
+.file-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: #3b82f6;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+.file-link:hover {
+  color: #1d4ed8;
+}
+.file-icon {
+  width: 20px;
+  height: 20px;
+}
+.size-badge {
+  background: #f1f5f9;
+  color: #475569;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+}
+.upload-time {
+  color: #64748b;
+  font-size: 14px;
+}
+.action-buttons {
+  display: flex;
+  gap: 8px;
+}
+.action-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+.action-icon {
+  width: 16px;
+  height: 16px;
+}
+.view-btn {
+  background: #dbeafe;
+  color: #3b82f6;
+}
+.view-btn:hover {
+  background: #bfdbfe;
+}
+.delete-btn {
+  background: #fee2e2;
+  color: #ef4444;
+}
+.delete-btn:hover {
+  background: #fecaca;
+}
+.empty-row td {
+  border: none;
+}
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #64748b;
+}
+.empty-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 16px;
+  color: #cbd5e1;
+}
+.empty-state p {
+  margin: 0;
+  font-size: 16px;
+}
+
+/* 退出确认弹窗 (保持您原有的样式) */
+.dialog-mask {
+  position: fixed;
+  z-index: 1000;
+  left: 0; top: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.dialog {
+  background: #fff;
+  border-radius: 12px;
+  padding: 32px 24px 24px 24px;
+  min-width: 260px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+}
+.dialog-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+}
+.dialog-btn {
+  padding: 8px 20px;
+  border-radius: 6px;
+  border: none;
+  background: #3b82f6;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.dialog-btn.danger {
+  background: #ef4444;
+}
+.dialog-btn:active {
+  background: #2563eb;
+}
+
+/* 响应式设计 (保持您原有的样式) */
+@media (max-width: 768px) {
   .header-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 24px 0;
-  }
-  
-  .page-title {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 28px;
-    font-weight: 700;
-    color: #1e293b;
-  }
-  
-  .title-icon {
-    width: 32px;
-    height: 32px;
-    color: #3b82f6;
-  }
-  
-  .user-profile {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    background: #f8fafc;
-    padding: 12px 16px;
-    border-radius: 12px;
-    border: 1px solid #e2e8f0;
-  }
-  
-  .user-avatar {
-    width: 40px;
-    height: 40px;
-    background: #3b82f6;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-  }
-  
-  .user-avatar svg {
-    width: 24px;
-    height: 24px;
-  }
-  
-  .username {
-    font-weight: 600;
-    color: #1e293b;
-    font-size: 16px;
-  }
-  
-  .user-email {
-    font-size: 14px;
-    color: #64748b;
-  }
-  
-  /* 统计区域 */
-  .stats-section {
-    padding: 32px 0;
-  }
-  
-  .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 24px;
-  }
-  
-  .stat-card {
-    background: white;
-    border-radius: 16px;
-    padding: 24px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    border: 1px solid #e2e8f0;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-  
-  .stat-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1);
-  }
-  
-  .stat-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-  }
-  
-  .stat-icon svg {
-    width: 24px;
-    height: 24px;
-  }
-  
-  .stat-label {
-    font-size: 14px;
-    color: #64748b;
-    margin-bottom: 4px;
-  }
-  
-  .stat-value {
-    font-size: 24px;
-    font-weight: 700;
-    color: #1e293b;
-  }
-  
-  /* 操作区域 */
-  .actions-section {
-    padding: 0 0 32px 0;
-    text-align: center;
-  }
-  
-  .upload-btn, .paste-btn {
-    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-    color: white;
-    border: none;
-    padding: 16px 32px;
-    border-radius: 12px;
-    font-size: 16px;
-    font-weight: 600;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    transition: all 0.2s;
-    box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.39);
-  }
-  
-  .upload-btn:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px 0 rgba(59, 130, 246, 0.5);
-  }
-  
-  .upload-btn:disabled, .paste-btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-  
-  .btn-icon {
-    width: 20px;
-    height: 20px;
-  }
-
-  .upload-buttons {
-    display: flex;
-    gap: 16px;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-
-  .paste-btn {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    box-shadow: 0 4px 14px 0 rgba(16, 185, 129, 0.39);
-  }
-
-  .paste-btn:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px 0 rgba(16, 185, 129, 0.5);
-  }
-
-  .paste-btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-
-  /* 弹窗样式 */
-  .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    backdrop-filter: blur(4px);
-  }
-
-  .modal-content {
-    background: white;
-    border-radius: 16px;
-    width: 90%;
-    max-width: 600px;
-    max-height: 90vh;
-    overflow: hidden;
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  }
-
-  .modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 24px;
-    border-bottom: 1px solid #e2e8f0;
-  }
-
-  .modal-title {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 20px;
-    font-weight: 600;
-    color: #1e293b;
-    margin: 0;
-  }
-
-  .modal-icon {
-    width: 24px;
-    height: 24px;
-    color: #10b981;
-  }
-
-  .close-btn {
-    background: none;
-    border: none;
-    color: #64748b;
-    cursor: pointer;
-    padding: 4px;
-    border-radius: 4px;
-    transition: all 0.2s;
-  }
-
-  .close-btn:hover {
-    background: #f1f5f9;
-    color: #1e293b;
-  }
-
-  .close-btn svg {
-    width: 20px;
-    height: 20px;
-  }
-
-  .modal-body {
-    padding: 24px;
-    max-height: 50vh;
-    overflow-y: auto;
-  }
-
-  .form-group {
-    margin-bottom: 20px;
-  }
-
-  .form-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 500;
-    color: #374151;
-  }
-
-  .form-input {
-    width: 100%;
-    padding: 12px 16px;
-    border: 2px solid #e2e8f0;
-    border-radius: 8px;
-    font-size: 14px;
-    outline: none;
-    transition: border-color 0.2s;
-    box-sizing: border-box;
-  }
-
-  .form-input:focus {
-    border-color: #10b981;
-  }
-
-  .form-textarea {
-    width: 100%;
-    padding: 12px 16px;
-    border: 2px solid #e2e8f0;
-    border-radius: 8px;
-    font-size: 14px;
-    outline: none;
-    transition: border-color 0.2s;
-    resize: vertical;
-    min-height: 240px;
-    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-    line-height: 1.5;
-    box-sizing: border-box;
-  }
-
-  .form-textarea:focus {
-    border-color: #10b981;
-  }
-
-  .modal-footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 12px;
-    padding: 24px;
-    border-top: 1px solid #e2e8f0;
-    background: #f8fafc;
-  }
-
-  .cancel-btn {
-    background: white;
-    color: #64748b;
-    border: 1px solid #e2e8f0;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  .cancel-btn:hover {
-    background: #f8fafc;
-    border-color: #cbd5e1;
-  }
-
-  .submit-btn {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    color: white;
-    border: none;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-    box-shadow: 0 4px 14px 0 rgba(16, 185, 129, 0.39);
-  }
-
-  .submit-btn:hover:not(:disabled) {
-    transform: translateY(-1px);
-    box-shadow: 0 8px 25px 0 rgba(16, 185, 129, 0.5);
-  }
-
-  .submit-btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-  
-  /* 文件列表区域 */
-  .files-section {
-    padding-bottom: 40px;
-  }
-  
-  .files-card {
-    background: white;
-    border-radius: 16px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    border: 1px solid #e2e8f0;
-    overflow: hidden;
-  }
-  
-  .card-header {
-    padding: 24px;
-    border-bottom: 1px solid #e2e8f0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .card-title {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 20px;
-    font-weight: 600;
-    color: #1e293b;
-    margin: 0;
-  }
-  
-  .file-count {
-    font-size: 14px;
-    color: #64748b;
-    background: #f1f5f9;
-    padding: 4px 12px;
-    border-radius: 20px;
-  }
-  
-  .files-table-container {
-    overflow-x: auto;
-  }
-  
-  .files-table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  
-  .files-table th {
-    background: #f8fafc;
-    padding: 16px 24px;
-    text-align: left;
-    font-weight: 600;
-    color: #475569;
-    font-size: 14px;
-    border-bottom: 1px solid #e2e8f0;
-  }
-  
-  .file-row {
-    transition: background-color 0.2s;
-  }
-  
-  .file-row:hover {
-    background: #f8fafc;
-  }
-  
-  .files-table td {
-    padding: 16px 24px;
-    border-bottom: 1px solid #f1f5f9;
-    vertical-align: middle;
-  }
-  
-  /* 项目名称单元格 */
-  .project-info {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  
-  .project-avatar {
-    width: 36px;
-    height: 36px;
-    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-    color: white;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 600;
-    font-size: 14px;
-  }
-  
-  .project-name {
-    font-weight: 500;
-    color: #1e293b;
-  }
-  
-  .project-input {
-    border: 2px solid #3b82f6;
-    border-radius: 6px;
-    padding: 4px 8px;
-    font-size: 14px;
-    outline: none;
-    min-width: 120px;
-  }
-  
-  .edit-btn {
-    background: none;
-    border: none;
-    color: #64748b;
-    cursor: pointer;
-    padding: 4px;
-    border-radius: 4px;
-    transition: all 0.2s;
-  }
-  
-  .edit-btn:hover {
-    background: #f1f5f9;
-    color: #3b82f6;
-  }
-  
-  .edit-btn svg {
-    width: 16px;
-    height: 16px;
-  }
-  
-  /* 文件名单元格 */
-  .file-link {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    text-decoration: none;
-    color: #3b82f6;
-    font-weight: 500;
-    transition: color 0.2s;
-  }
-  
-  .file-link:hover {
-    color: #1d4ed8;
-  }
-  
-  .file-icon {
-    width: 20px;
-    height: 20px;
-    color: #3b82f6;
-  }
-  
-  /* 文件大小单元格 */
-  .size-badge {
-    background: #f1f5f9;
-    color: #475569;
-    padding: 4px 8px;
-    border-radius: 6px;
-    font-size: 12px;
-    font-weight: 500;
-  }
-  
-  /* 时间单元格 */
-  .upload-time {
-    color: #64748b;
-    font-size: 14px;
-  }
-  
-  /* 操作单元格 */
-  .action-buttons {
-    display: flex;
-    gap: 8px;
-  }
-  
-  .action-btn {
-    width: 32px;
-    height: 32px;
-    border: none;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s;
-    text-decoration: none;
-  }
-  
-  .action-btn svg {
-    width: 16px;
-    height: 16px;
-  }
-  
-  .view-btn {
-    background: #dbeafe;
-    color: #3b82f6;
-  }
-  
-  .view-btn:hover {
-    background: #bfdbfe;
-    color: #1d4ed8;
-  }
-  
-  .delete-btn {
-    background: #fee2e2;
-    color: #ef4444;
-  }
-  
-  .delete-btn:hover {
-    background: #fecaca;
-    color: #dc2626;
-  }
-  
-  /* 空状态 */
-  .empty-row td {
-    border: none;
-  }
-  
-  .empty-state {
-    text-align: center;
-    padding: 60px 20px;
-    color: #64748b;
-  }
-  
-  .empty-icon {
-    width: 64px;
-    height: 64px;
-    margin: 0 auto 16px;
-    color: #cbd5e1;
-  }
-  
-  .empty-state p {
-    margin: 0;
-    font-size: 16px;
-  }
-  
-  /* 响应式设计 */
-  @media (max-width: 768px) {
-    .header-content {
-      flex-direction: column;
-      gap: 16px;
-      text-align: center;
-    }
-    
-    .stats-grid {
-      grid-template-columns: 1fr;
-    }
-    
-    .files-table-container {
-      font-size: 14px;
-    }
-    
-    .files-table th,
-    .files-table td {
-      padding: 12px 16px;
-    }
-    
-    .project-info {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 8px;
-    }
-    
-    .action-buttons {
-      flex-direction: column;
-    }
-  }
-  
-  @media (max-width: 480px) {
-    .container {
-      padding: 0 16px;
-    }
-    
-    .page-title {
-      font-size: 24px;
-    }
-    
-    .upload-btn, .paste-btn {
-      padding: 12px 24px;
-      font-size: 14px;
-    }
-  }
-
-  .logout-btn {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: #fee2e2;
-    color: #ef4444;
-    border: none;
-    border-radius: 8px;
-    padding: 8px 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s, color 0.2s;
-  }
-  .logout-btn:hover {
-    background: #fecaca;
-    color: #dc2626;
-  }
-  .logout-btn svg {
-    width: 18px;
-    height: 18px;
-  }
-  .dialog-mask {
-    position: fixed;
-    z-index: 1000;
-    left: 0; top: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.25);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .dialog {
-    background: #fff;
-    border-radius: 12px;
-    padding: 32px 24px 24px 24px;
-    min-width: 260px;
-    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-    display: flex;
     flex-direction: column;
     gap: 16px;
-    align-items: center;
+    text-align: center;
   }
-  .dialog-actions {
-    display: flex;
-    gap: 16px;
-    justify-content: center;
+  .stats-grid {
+    grid-template-columns: 1fr;
   }
-  .dialog-btn {
-    padding: 8px 20px;
-    border-radius: 6px;
-    border: none;
-    background: #3b82f6;
-    color: #fff;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s;
+  .files-table-container {
+    font-size: 14px;
   }
-  .dialog-btn.danger {
-    background: #ef4444;
+  .files-table th,
+  .files-table td {
+    padding: 12px 16px;
   }
-  .dialog-btn:active {
-    background: #2563eb;
+  .project-info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
   }
-  </style>
-  
+  .action-buttons {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0 16px;
+  }
+  .page-title {
+    font-size: 24px;
+  }
+  .upload-btn, .paste-btn {
+    padding: 12px 24px;
+    font-size: 14px;
+  }
+}
+</style>
