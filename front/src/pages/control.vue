@@ -20,6 +20,11 @@
                 <div class="username">{{ userStore.userInfo.username }}</div>
                 <div class="user-email">{{ userStore.userInfo.email }}</div>
               </div>
+              <button class="logout-btn" @click="handleLogout" title="注销">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M16,17V14H9V10H16V7L21,12L16,17M14,2A2,2 0 0,1 16,4V6H14V4H5V20H14V18H16V20A2,2 0 0,1 14,22H5A2,2 0 0,1 3,20V4A2,2 0 0,1 5,2H14Z"/>
+                </svg>
+              </button>
             </div>
           </div>
         </div>
@@ -254,6 +259,7 @@
   <script setup lang="ts">
   import { ref, nextTick, onMounted } from 'vue'
   import { useUserStore } from '@/stores/user'
+  import { useRouter } from 'vue-router'
 
   // 处理文件URL，确保在生产环境中使用正确的端口
   const getFileUrl = (url: string): string => {
@@ -286,6 +292,7 @@
 
   const editInput = ref<HTMLInputElement[]>([])
   const userStore = useUserStore()
+  const router = useRouter()
 
   // 粘贴弹窗相关
   const showPasteModal = ref(false)
@@ -410,6 +417,11 @@
     } finally {
       userStore.isUploading = false
     }
+  }
+
+  const handleLogout = () => {
+    userStore.logout();
+    router.push('/login');
   }
 
   // 组件图标
