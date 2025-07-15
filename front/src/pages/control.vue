@@ -49,16 +49,28 @@
       <!-- 操作区域 -->
       <div class="actions-section">
         <div class="container">
-          <button 
-            class="upload-btn"
-            @click="handleUpload"
-            :disabled="userStore.isUploading"
-          >
-            <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
-            </svg>
-            {{ userStore.isUploading ? '上传中...' : '上传新文件' }}
-          </button>
+          <div class="upload-buttons">
+            <button 
+              class="upload-btn"
+              @click="handleUpload"
+              :disabled="userStore.isUploading"
+            >
+              <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z"/>
+              </svg>
+              {{ userStore.isUploading ? '上传中...' : '上传新文件' }}
+            </button>
+            <button 
+              class="paste-btn"
+              @click="showPasteModal = true"
+              :disabled="userStore.isUploading"
+            >
+              <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19,20H5V4H7V7H17V4H19M12,2A1,1 0 0,1 13,3A1,1 0 0,1 12,4A1,1 0 0,1 11,3A1,1 0 0,1 12,2M19,2H14.82C14.4,0.84 13.3,0 12,0C10.7,0 9.6,0.84 9.18,2H5A2,2 0 0,0 3,4V20A2,2 0 0,0 5,22H19A2,2 0 0,0 21,20V4A2,2 0 0,0 19,2Z"/>
+              </svg>
+              粘贴HTML代码
+            </button>
+          </div>
         </div>
       </div>
   
@@ -185,6 +197,57 @@
           </div>
         </div>
       </div>
+      
+      <!-- HTML代码粘贴弹窗 -->
+      <div v-if="showPasteModal" class="modal-overlay" @click="closePasteModal">
+        <div class="modal-content" @click.stop>
+          <div class="modal-header">
+            <h3 class="modal-title">
+              <svg class="modal-icon" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19,20H5V4H7V7H17V4H19M12,2A1,1 0 0,1 13,3A1,1 0 0,1 12,4A1,1 0 0,1 11,3A1,1 0 0,1 12,2M19,2H14.82C14.4,0.84 13.3,0 12,0C10.7,0 9.6,0.84 9.18,2H5A2,2 0 0,0 3,4V20A2,2 0 0,0 5,22H19A2,2 0 0,0 21,20V4A2,2 0 0,0 19,2Z"/>
+              </svg>
+              粘贴HTML代码
+            </h3>
+            <button class="close-btn" @click="closePasteModal">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/>
+              </svg>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label for="project-name">项目名称</label>
+              <input 
+                id="project-name"
+                v-model="pasteForm.projectName"
+                type="text"
+                placeholder="请输入项目名称"
+                class="form-input"
+              />
+            </div>
+            <div class="form-group">
+              <label for="html-code">HTML代码</label>
+              <textarea 
+                id="html-code"
+                v-model="pasteForm.htmlCode"
+                placeholder="请粘贴您的HTML代码..."
+                class="form-textarea"
+                rows="12"
+              ></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="cancel-btn" @click="closePasteModal">取消</button>
+            <button 
+              class="submit-btn"
+              @click="handlePasteUpload"
+              :disabled="!pasteForm.projectName.trim() || !pasteForm.htmlCode.trim() || userStore.isUploading"
+            >
+              {{ userStore.isUploading ? '上传中...' : '上传' }}
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   </template>
   
@@ -223,6 +286,13 @@
 
   const editInput = ref<HTMLInputElement[]>([])
   const userStore = useUserStore()
+
+  // 粘贴弹窗相关
+  const showPasteModal = ref(false)
+  const pasteForm = ref({
+    projectName: '',
+    htmlCode: ''
+  })
 
   // 页面加载时自动初始化数据
   onMounted(async () => {
@@ -307,6 +377,38 @@
       await userStore.deleteFile(file.id)
     } catch (error) {
       alert('删除失败，请重试')
+    }
+  }
+
+  // 粘贴弹窗相关功能
+  const closePasteModal = () => {
+    showPasteModal.value = false
+    pasteForm.value = {
+      projectName: '',
+      htmlCode: ''
+    }
+  }
+
+  const handlePasteUpload = async () => {
+    if (!pasteForm.value.projectName.trim() || !pasteForm.value.htmlCode.trim()) {
+      alert('请填写项目名称和HTML代码')
+      return
+    }
+    
+    try {
+      userStore.isUploading = true
+      
+      // 创建一个Blob对象来模拟文件
+      const blob = new Blob([pasteForm.value.htmlCode], { type: 'text/html' })
+      const file = new File([blob], `${pasteForm.value.projectName}.html`, { type: 'text/html' })
+      
+      await userStore.uploadFile(file)
+      closePasteModal()
+      
+    } catch (error) {
+      alert('上传失败，请重试')
+    } finally {
+      userStore.isUploading = false
     }
   }
 
@@ -460,7 +562,7 @@
     text-align: center;
   }
   
-  .upload-btn {
+  .upload-btn, .paste-btn {
     background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
     color: white;
     border: none;
@@ -481,7 +583,7 @@
     box-shadow: 0 8px 25px 0 rgba(59, 130, 246, 0.5);
   }
   
-  .upload-btn:disabled {
+  .upload-btn:disabled, .paste-btn:disabled {
     opacity: 0.6;
     cursor: not-allowed;
   }
@@ -489,6 +591,197 @@
   .btn-icon {
     width: 20px;
     height: 20px;
+  }
+
+  .upload-buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .paste-btn {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    box-shadow: 0 4px 14px 0 rgba(16, 185, 129, 0.39);
+  }
+
+  .paste-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px 0 rgba(16, 185, 129, 0.5);
+  }
+
+  .paste-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  /* 弹窗样式 */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+  }
+
+  .modal-content {
+    background: white;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow: hidden;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  .modal-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 20px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+  }
+
+  .modal-icon {
+    width: 24px;
+    height: 24px;
+    color: #10b981;
+  }
+
+  .close-btn {
+    background: none;
+    border: none;
+    color: #64748b;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    transition: all 0.2s;
+  }
+
+  .close-btn:hover {
+    background: #f1f5f9;
+    color: #1e293b;
+  }
+
+  .close-btn svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .modal-body {
+    padding: 24px;
+    max-height: 50vh;
+    overflow-y: auto;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  .form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #374151;
+  }
+
+  .form-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+  }
+
+  .form-input:focus {
+    border-color: #10b981;
+  }
+
+  .form-textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    resize: vertical;
+    min-height: 240px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    line-height: 1.5;
+    box-sizing: border-box;
+  }
+
+  .form-textarea:focus {
+    border-color: #10b981;
+  }
+
+  .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 24px;
+    border-top: 1px solid #e2e8f0;
+    background: #f8fafc;
+  }
+
+  .cancel-btn {
+    background: white;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .cancel-btn:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+  }
+
+  .submit-btn {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 14px 0 rgba(16, 185, 129, 0.39);
+  }
+
+  .submit-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 25px 0 rgba(16, 185, 129, 0.5);
+  }
+
+  .submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
   
   /* 文件列表区域 */
@@ -762,7 +1055,7 @@
       font-size: 24px;
     }
     
-    .upload-btn {
+    .upload-btn, .paste-btn {
       padding: 12px 24px;
       font-size: 14px;
     }
