@@ -12,7 +12,7 @@ RUN npm run build
 FROM python:3.10-slim AS backend
 WORKDIR /app/backend
 COPY backend/ .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --timeout 300 --retries 3 -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements.txt
 
 # 创建必要的目录
 RUN mkdir -p /app/data /app/html_files /app/uploads
