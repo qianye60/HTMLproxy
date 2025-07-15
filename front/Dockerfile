@@ -25,7 +25,7 @@ FROM nginx:stable-alpine
 COPY --from=builder /app/dist /usr/share/nginx/html
 
 # 复制nginx配置（如果需要自定义配置）
-# COPY nginx.conf /etc/nginx/nginx.conf
+COPY ../nginx.conf /etc/nginx/nginx.conf
 
 # 暴露端口
 EXPOSE 80
