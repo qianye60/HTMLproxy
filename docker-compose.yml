@@ -1,9 +1,7 @@
 version: '3.8'
 services:
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
+    image: qianye60/htmlproxy-backend:latest
     volumes:
       - ./data:/app/data
       - ./html_files:/app/html_files
@@ -17,9 +15,7 @@ services:
       - app-network
 
   frontend:
-    build:
-      context: ./front
-      dockerfile: Dockerfile
+    image: qianye60/htmlproxy-frontend:latest
     ports:
       - "8080:80"
     depends_on:
