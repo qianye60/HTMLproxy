@@ -20,10 +20,11 @@
                 <div class="username">{{ userStore.userInfo.username }}</div>
                 <div class="user-email">{{ userStore.userInfo.email }}</div>
               </div>
-              <button class="logout-btn" @click="handleLogout" title="注销">
+              <button class="logout-btn" @click="showLogoutConfirm = true" title="退出登录">
                 <svg viewBox="0 0 24 24" fill="currentColor">
                   <path d="M16,17V14H9V10H16V7L21,12L16,17M14,2A2,2 0 0,1 16,4V6H14V4H5V20H14V18H16V20A2,2 0 0,1 14,22H5A2,2 0 0,1 3,20V4A2,2 0 0,1 5,2H14Z"/>
                 </svg>
+                <span>退出</span>
               </button>
             </div>
           </div>
@@ -253,6 +254,17 @@
           </div>
         </div>
       </div>
+
+      <!-- 退出确认弹窗 -->
+      <div v-if="showLogoutConfirm" class="dialog-mask">
+        <div class="dialog">
+          <h3>确认退出登录？</h3>
+          <div class="dialog-actions">
+            <button @click="confirmLogout" class="dialog-btn danger">确定</button>
+            <button @click="showLogoutConfirm = false" class="dialog-btn">取消</button>
+          </div>
+        </div>
+      </div>
     </div>
   </template>
   
@@ -300,6 +312,13 @@
     projectName: '',
     htmlCode: ''
   })
+
+  // 退出确认弹窗
+  const showLogoutConfirm = ref(false)
+  const confirmLogout = () => {
+    showLogoutConfirm.value = false
+    handleLogout()
+  }
 
   // 页面加载时自动初始化数据
   onMounted(async () => {
@@ -1071,6 +1090,69 @@
       padding: 12px 24px;
       font-size: 14px;
     }
+  }
+
+  .logout-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #fee2e2;
+    color: #ef4444;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+  }
+  .logout-btn:hover {
+    background: #fecaca;
+    color: #dc2626;
+  }
+  .logout-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+  .dialog-mask {
+    position: fixed;
+    z-index: 1000;
+    left: 0; top: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .dialog {
+    background: #fff;
+    border-radius: 12px;
+    padding: 32px 24px 24px 24px;
+    min-width: 260px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+  }
+  .dialog-actions {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+  }
+  .dialog-btn {
+    padding: 8px 20px;
+    border-radius: 6px;
+    border: none;
+    background: #3b82f6;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .dialog-btn.danger {
+    background: #ef4444;
+  }
+  .dialog-btn:active {
+    background: #2563eb;
   }
   </style>
   
