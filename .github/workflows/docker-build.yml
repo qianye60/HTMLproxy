@@ -28,16 +28,27 @@ jobs:
         run: |
           TIMESTAMP=$(date +'%Y%m%d-%H%M%S')
           COMMIT_SHA_SHORT=$(echo $GITHUB_SHA | cut -c1-7)
-          echo "tags=qianye60/htmlproxy:latest,qianye60/htmlproxy:$TIMESTAMP,qianye60/htmlproxy:$COMMIT_SHA_SHORT" >> $GITHUB_OUTPUT
+          echo "backend_tags=qianye60/htmlproxy-backend:latest,qianye60/htmlproxy-backend:$TIMESTAMP,qianye60/htmlproxy-backend:$COMMIT_SHA_SHORT" >> $GITHUB_OUTPUT
+          echo "frontend_tags=qianye60/htmlproxy-frontend:latest,qianye60/htmlproxy-frontend:$TIMESTAMP,qianye60/htmlproxy-frontend:$COMMIT_SHA_SHORT" >> $GITHUB_OUTPUT
 
-      - name: 构建并推送Docker镜像
+      - name: 构建并推送后端Docker镜像
         uses: docker/build-push-action@v6
         with:
-          context: .
-          file: ./Dockerfile
-          target: nginx
+          context: ./backend
+          file: ./backend/Dockerfile
           push: true
-          tags: ${{ steps.tags.outputs.tags }}
+          tags: ${{ steps.tags.outputs.backend_tags }}
           platforms: linux/amd64
-          cache-from: type=registry,ref=qianye60/htmlproxy:buildcache
-          cache-to: type=registry,ref=qianye60/htmlproxy:buildcache,mode=max,ignore-error=true 
+          cache-from: type=registry,ref=qianye60/htmlproxy-backend:buildcache
+          cache-to: type=registry,ref=qianye60/htmlproxy-backend:buildcache,mode=max,ignore-error=true
+
+      - name: 构建并推送前端Docker镜像
+        uses: docker/build-push-action@v6
+        with:
+          context: ./front
+          file: ./front/Dockerfile
+          push: true
+          tags: ${{ steps.tags.outputs.frontend_tags }}
+          platforms: linux/amd64
+          cache-from: type=registry,ref=qianye60/htmlproxy-frontend:buildcache
+          cache-to: type=registry,ref=qianye60/htmlproxy-frontend:buildcache,mode=max,ignore-error=true 

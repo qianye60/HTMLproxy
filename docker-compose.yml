@@ -2,9 +2,8 @@ version: '3.8'
 services:
   backend:
     build:
-      context: .
+      context: ./backend
       dockerfile: Dockerfile
-      target: backend
     volumes:
       - ./data:/app/data
       - ./html_files:/app/html_files
@@ -12,24 +11,19 @@ services:
     environment:
       - HTML_DIR=/app/html_files
       - UPLOAD_DIR=/app/uploads
-    expose:
-      - "40000"
+    ports:
+      - "40000:40000"
     networks:
       - app-network
 
-  nginx:
+  frontend:
     build:
-      context: .
+      context: ./front
       dockerfile: Dockerfile
-      target: nginx
     ports:
       - "8080:80"
     depends_on:
       - backend
-    volumes:
-      - ./data:/app/data
-      - ./html_files:/app/html_files
-      - ./uploads:/app/uploads
     networks:
       - app-network
 
