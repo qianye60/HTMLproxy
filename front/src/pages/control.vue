@@ -94,6 +94,14 @@
               <ClipboardPaste class="btn-icon" />
               粘贴HTML代码
             </button>
+            <button 
+              class="ai-btn"
+              @click="showAIGenModal = true"
+              :disabled="userStore.isUploading"
+            >
+              <Sparkles class="btn-icon" />
+              AI生成HTML
+            </button>
           </div>
         </div>
       </div>
@@ -250,6 +258,63 @@
       </div>
     </div>
 
+    <!-- AI生成HTML弹窗 -->
+    <div v-if="showAIGenModal" class="modal-overlay" @click="closeAIGenModal">
+      <div class="modal-content" @click.stop>
+        <div class="modal-header">
+          <h3 class="modal-title">
+            <Sparkles class="modal-icon" />
+            AI生成HTML
+          </h3>
+          <button class="close-btn" @click="closeAIGenModal">
+            <X class="close-icon" />
+          </button>
+        </div>
+        <div class="modal-body">
+          <input
+            v-model="aiApiUrl"
+            placeholder="API地址（如：httpss://newapi.com/v1）"
+            title="如：https://x.openai.com/v1/chat/completions 或 httpss://newapi.com/v1"
+            class="form-input"
+            style="margin-bottom:12px;"
+          />
+          <input
+            v-model="aiApiKey"
+            placeholder="请输入 API 密钥（sk-...）"
+            class="form-input"
+            style="margin-bottom:12px;"
+            type="password"
+          />
+          <div style="display:flex;gap:8px;margin-bottom:12px;">
+            <select v-model="aiModel" class="form-input" style="flex:1;" :disabled="aiModelList.length === 0">
+              <option v-for="model in aiModelList" :key="model.id || model" :value="model.id || model">
+                {{ model.id || model }}
+              </option>
+            </select>
+            <button class="submit-btn" style="padding:0 16px;min-width:80px;" @click="fetchAIModellist" :disabled="!aiApiUrl || !aiApiKey">获取模型</button>
+          </div>
+          <textarea
+            v-model="aiPrompt"
+            placeholder="请输入你想要生成的网页描述，如：一个带有蓝色按钮的简洁登录页"
+            class="form-textarea"
+            rows="6"
+          ></textarea>
+          <div v-if="aiHtml" class="ai-html-preview">
+            <label>生成结果预览：</label>
+            <iframe :srcdoc="aiHtml" class="ai-html-iframe"></iframe>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="cancel-btn" @click="closeAIGenModal">取消</button>
+          <button class="submit-btn" @click="handleAIGenerate" :disabled="!aiPrompt || !aiApiUrl || !aiApiKey || !aiModel || userStore.isUploading">
+            {{ userStore.isUploading ? '生成中...' : '生成HTML' }}
+          </button>
+          <button v-if="aiHtml" class="submit-btn" @click="uploadAIGeneratedHtml">一键上传</button>
+          <button v-if="aiHtml" class="submit-btn" @click="downloadAIGeneratedHtml">下载HTML</button>
+        </div>
+      </div>
+    </div>
+
     <!-- 退出确认弹窗 -->
     <div v-if="showLogoutConfirm" class="dialog-mask">
       <div class="dialog">
@@ -269,7 +334,7 @@ import { useUserStore } from '@/stores/user'
 import { useRouter } from 'vue-router'
 import { 
   LayoutDashboard, User, LogOut, FileUp, ClipboardPaste, List, 
-  Pencil, FileText, ExternalLink, Trash2, FolderOpen, X, UploadCloud
+  Pencil, FileText, ExternalLink, Trash2, FolderOpen, X, UploadCloud, Sparkles
 } from 'lucide-vue-next'
 
 const editInput = ref<HTMLInputElement[]>([])
@@ -289,6 +354,124 @@ const showLogoutConfirm = ref(false)
 const confirmLogout = () => {
   showLogoutConfirm.value = false
   handleLogout()
+}
+
+// AI生成HTML弹窗相关
+const showAIGenModal = ref(false)
+const aiPrompt = ref('')
+const aiHtml = ref('')
+const aiApiUrl = ref('')
+const aiApiKey = ref('')
+const aiModel = ref('')
+const aiModelList = ref<string[]|any[]>([])
+
+const closeAIGenModal = () => {
+  showAIGenModal.value = false
+  aiPrompt.value = ''
+  aiHtml.value = ''
+  aiApiUrl.value = ''
+  aiApiKey.value = ''
+  aiModel.value = ''
+  aiModelList.value = []
+}
+
+const fetchAIModellist = async () => {
+  if (!aiApiUrl.value || !aiApiKey.value) return
+  // 尝试自动推断模型列表API
+  let baseUrl = aiApiUrl.value
+  if (baseUrl.endsWith('/chat/completions')) {
+    baseUrl = baseUrl.replace(/\/chat\/completions$/, '')
+  }
+  const url = baseUrl + '/models'
+  try {
+    const res = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Authorization': 'Bearer ' + aiApiKey.value
+      }
+    })
+    const data = await res.json()
+    // OpenAI格式：{ data: [ {id: 'gpt-3.5-turbo', ...}, ... ] }
+    if (Array.isArray(data.data)) {
+      aiModelList.value = data.data
+      aiModel.value = data.data[0]?.id || ''
+    } else if (Array.isArray(data.models)) {
+      aiModelList.value = data.models
+      aiModel.value = data.models[0]?.id || data.models[0] || ''
+    } else {
+      aiModelList.value = []
+      aiModel.value = ''
+    }
+  } catch (e) {
+    aiModelList.value = []
+    aiModel.value = ''
+  }
+}
+
+const handleAIGenerate = async () => {
+  if (!aiPrompt.value.trim() || !aiApiUrl.value.trim() || !aiApiKey.value.trim() || !aiModel.value) return
+  userStore.isUploading = true
+  aiHtml.value = ''
+  try {
+    let apiUrl = aiApiUrl.value.trim()
+    // 自动适配 /v1 或 /v1/chat/completions
+    if (apiUrl.endsWith('/v1')) {
+      apiUrl = apiUrl + '/chat/completions'
+    } else if (!apiUrl.endsWith('/chat/completions')) {
+      // 如果不是标准结尾，可以根据需要补全或提示
+      // 这里直接用用户输入，兼容自定义API
+    }
+    const res = await fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + aiApiKey.value
+      },
+      body: JSON.stringify({
+        model: aiModel.value,
+        messages: [
+          {
+            role: 'system',
+            content: '你是一个专业的前端开发AI。请根据用户的描述生成完整、可用的 HTML 页面，只返回 HTML 代码，不要包含任何 markdown 代码块、注释或解释说明。'
+          },
+          {
+            role: 'user',
+            content: aiPrompt.value
+          }
+        ],
+        temperature: 0.7,
+        stream: false
+      })
+    })
+    const data = await res.json()
+    let html = data.choices?.[0]?.message?.content || ''
+    // 去除 markdown 代码块
+    html = html.replace(/^```html[\s\r\n]*|```$/gi, '').replace(/^```[\s\r\n]*|```$/gi, '').trim()
+    aiHtml.value = html
+  } catch (e) {
+    alert('生成失败，请检查API地址、密钥或模型')
+  } finally {
+    userStore.isUploading = false
+  }
+}
+
+const uploadAIGeneratedHtml = async () => {
+  if (!aiHtml.value) return
+  const blob = new Blob([aiHtml.value], { type: 'text/html' })
+  const file = new File([blob], 'ai-generated.html', { type: 'text/html' })
+  await uploadFileFlow(file)
+  closeAIGenModal()
+}
+
+const downloadAIGeneratedHtml = () => {
+  if (!aiHtml.value) return
+  const blob = new Blob([aiHtml.value], { type: 'text/html' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = 'ai-generated.html'
+  a.click()
+  URL.revokeObjectURL(url)
 }
 
 // 页面加载时自动初始化数据
@@ -685,6 +868,26 @@ const StorageIcon = {
   box-shadow: 0 6px 20px 0 rgba(16, 185, 129, 0.4);
 }
 
+.ai-btn {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e42 100%);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 14px 0 rgba(251, 191, 36, 0.3);
+  margin-left: 8px;
+}
+.ai-btn:hover:not(:disabled) {
+  background: #f59e42;
+}
+
 /* 弹窗样式 (保持您原有的样式) */
 .modal-overlay {
   position: fixed;
@@ -1014,6 +1217,17 @@ const StorageIcon = {
 .empty-state p {
   margin: 0;
   font-size: 16px;
+}
+
+.ai-html-preview {
+  margin-top: 16px;
+}
+.ai-html-iframe {
+  width: 100%;
+  min-height: 200px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #fff;
 }
 
 /* 退出确认弹窗 (保持您原有的样式) */
