@@ -67,8 +67,9 @@
 ```
 ## docker 拉取
 ```bash
-git clone
-
+git clone https://github.com/qianye60/HTMLproxy.git
+cd HTMLproxy
+docker compose up -d
 ```
 
 ## (docker 构建)部署步骤
