@@ -3,11 +3,12 @@ services:
     image: qianye60/htmlproxy-backend:latest
     volumes:
       - ./data:/app/data
-      - ./html_files:/app/html_files
+      - ./backend/html_files:/app/html_files
       - ./uploads:/app/uploads
     environment:
       - HTML_DIR=/app/html_files
       - UPLOAD_DIR=/app/uploads
+      - DATA_DIR=/app/data
     ports:
       - "40000:40000"
     networks:

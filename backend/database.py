@@ -7,9 +7,8 @@ from datetime import datetime
 # 数据库配置
 sqlite_file_name = "lxhtml.db"
 
-# 使用绝对路径确保数据库文件位置正确
-server_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-data_dir = os.path.join(server_dir, "data")
+# 使用环境变量或默认路径
+data_dir = os.getenv("DATA_DIR", "/app/data")
 
 # 确保数据目录存在
 os.makedirs(data_dir, exist_ok=True)
