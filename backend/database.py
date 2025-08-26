@@ -29,9 +29,12 @@ class User(SQLModel, table=True):
     username: str = Field(default=None)
     email: str = Field(default=None)
     hashed_password: str = Field(default=None)
+    is_admin: bool = Field(default=False)  # 是否为超级管理员
     
     # 关联文件
     files: List["File"] = Relationship(back_populates="user")
+    # 关联AI生成记录
+    ai_generations: List["AIGeneration"] = Relationship(back_populates="user")
 
 # 文件模型
 class File(SQLModel, table=True):
@@ -61,3 +64,36 @@ def get_session():
 
 # 会话依赖类型注解
 SessionDep = Annotated[Session, Depends(get_session)]
+
+# AI生成记录模型
+class AIGeneration(SQLModel, table=True):
+    """AI生成记录数据模型"""
+    id: int = Field(default=None, primary_key=True)
+    user_id: int = Field(foreign_key="user.id")
+    prompt: str = Field(default=None)  # 用户输入的提示词
+    generated_content: str = Field(default=None)  # 生成的HTML内容
+    generation_time: datetime = Field(default_factory=datetime.now)
+    
+    # 关联用户
+    user: User = Relationship(back_populates="ai_generations")
+
+# API配置模型  
+class APIConfig(SQLModel, table=True):
+    """API配置数据模型"""
+    id: int = Field(default=None, primary_key=True)
+    name: str = Field(default=None)  # 模型名称
+    api_key: str = Field(default=None)  # API密钥
+    base_url: str = Field(default=None)  # API基础URL
+    model: str = Field(default=None)  # 模型标识
+    is_active: bool = Field(default=True)  # 是否启用
+    created_time: datetime = Field(default_factory=datetime.now)
+    updated_time: datetime = Field(default_factory=datetime.now)
+
+# 系统配置模型
+class SystemConfig(SQLModel, table=True):
+    """系统配置数据模型"""
+    id: int = Field(default=None, primary_key=True)
+    key: str = Field(default=None, unique=True)  # 配置键
+    value: str = Field(default=None)  # 配置值
+    description: str = Field(default=None)  # 配置描述
+    updated_time: datetime = Field(default_factory=datetime.now)

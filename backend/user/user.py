@@ -3,7 +3,7 @@ import secrets
 from datetime import datetime, timedelta, timezone
 from typing import Annotated, List
 from database import get_session, User, File
-from fastapi import APIRouter, HTTPException, Depends, Header
+from fastapi import APIRouter, HTTPException, Depends, Header, status
 from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
 from passlib.context import CryptContext
@@ -62,6 +62,7 @@ class UserInfo(BaseModel):
     username: str
     email: str
     avatar: str = ""
+    is_admin: bool = False
 
 class FileResponse(BaseModel):
     """文件响应模型"""
@@ -115,11 +116,16 @@ async def register(request: RegisterRequest, session: Session = Depends(get_sess
     if session.exec(statement).first():
         raise HTTPException(status_code=400, detail="用户名已存在")
     
+    # 检查是否是第一个用户，如果是则设置为管理员
+    user_count = session.exec(select(User)).all()
+    is_first_user = len(user_count) == 0
+    
     # 创建新用户
     new_user = User(
         username=request.username, 
         email=request.email, 
-        hashed_password=get_password_hash(request.password)
+        hashed_password=get_password_hash(request.password),
+        is_admin=is_first_user  # 第一个用户为管理员
     )
     session.add(new_user)
     session.commit()
@@ -165,9 +171,32 @@ async def get_user_info(token: Annotated[str, Depends(oauth2_scheme)], session: 
         return UserInfo(
             username=user_db.username,
             email=user_db.email,
-            avatar=""
+            avatar="",
+            is_admin=user_db.is_admin
         )
     except InvalidTokenError:
         raise HTTPException(status_code=401, detail="无效的令牌")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"获取用户信息失败: {str(e)}") 
+        raise HTTPException(status_code=500, detail=f"获取用户信息失败: {str(e)}")
+
+def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], session: Session = Depends(get_session)) -> User:
+    """获取当前用户"""
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="无法验证凭据",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    
+    try:
+        payload = decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise credentials_exception
+    except InvalidTokenError:
+        raise credentials_exception
+    
+    user = get_user_by_username(username, session)
+    if user is None:
+        raise credentials_exception
+    
+    return user 

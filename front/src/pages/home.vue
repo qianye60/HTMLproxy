@@ -29,7 +29,11 @@
             <Upload class="btn-icon" />
             立即上传文件
           </button>
-          <button class="secondary-btn" @click="viewDemo">
+          <button class="secondary-btn" @click="tryAIGenerator">
+            <Sparkles class="btn-icon" />
+            AI生成网站
+          </button>
+          <button class="tertiary-btn" @click="viewDemo">
             <Eye class="btn-icon" />
             查看演示
           </button>
@@ -241,7 +245,7 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { 
   Zap, Upload, Eye, Globe, Clock, Shield, Server, Rocket, 
-  ArrowRight, Play, X, Copy, FileText, Image, Code, Palette
+  ArrowRight, Play, X, Copy, FileText, Image, Code, Palette, Sparkles
 } from 'lucide-vue-next'
 
 const router = useRouter()
@@ -339,6 +343,10 @@ const quickStart = () => {
   router.push('/control')
 }
 
+const tryAIGenerator = () => {
+  router.push('/ai-generator')
+}
+
 const viewDemo = () => {
   showDemoModal.value = true
 }
@@ -375,7 +383,7 @@ onMounted(() => {
 <style scoped>
 /* 全局样式 */
 .html-proxy-hero {
-  min-height: 100vh;
+  min-height: 95vh;
   background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);
   color: #1e293b;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
@@ -482,7 +490,7 @@ onMounted(() => {
   flex-wrap: wrap;
 }
 
-.primary-btn, .secondary-btn {
+.primary-btn, .secondary-btn, .tertiary-btn {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -508,12 +516,23 @@ onMounted(() => {
 }
 
 .secondary-btn {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  color: white;
+  box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+}
+
+.secondary-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 35px rgba(59, 130, 246, 0.4);
+}
+
+.tertiary-btn {
   background: white;
   color: #22c55e;
   border: 2px solid #22c55e;
 }
 
-.secondary-btn:hover {
+.tertiary-btn:hover {
   background: #22c55e;
   color: white;
   transform: translateY(-2px);
@@ -1123,7 +1142,7 @@ onMounted(() => {
   }
   
   .hero-section {
-    padding: 4rem 0 3rem;
+    padding: 3.5rem 0 2.5rem;
   }
   
   .hero-actions {
@@ -1131,7 +1150,7 @@ onMounted(() => {
     align-items: center;
   }
   
-  .primary-btn, .secondary-btn {
+  .primary-btn, .secondary-btn, .tertiary-btn {
     width: 100%;
     max-width: 300px;
     justify-content: center;
@@ -1164,7 +1183,7 @@ onMounted(() => {
   }
   
   .cta-content {
-    padding: 3rem 1.5rem;
+    padding: 2.5rem 1.2rem;
   }
   
   .cta-title {

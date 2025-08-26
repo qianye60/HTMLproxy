@@ -2,6 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../pages/home.vue'
 import LoginView from '../pages/login.vue'
 import ControlView from '../pages/control.vue'
+import AdminView from '../pages/admin.vue'
+import AIGeneratorView from '../pages/ai-generator.vue'
 import { useUserStore } from '@/stores/user'
 
 const router = createRouter({
@@ -24,6 +26,18 @@ const router = createRouter({
       name: 'control',
       component: ControlView,
       meta: { requiresAuth: true }
+    },
+    {
+      path: '/ai-generator',
+      name: 'ai-generator',
+      component: AIGeneratorView,
+      meta: { requiresAuth: true }
+    },
+    {
+      path: '/admin',
+      name: 'admin',
+      component: AdminView,
+      meta: { requiresAuth: true, requiresAdmin: true }
     },
   ],
 })
@@ -57,8 +71,12 @@ router.beforeEach(async (to, from) => {
   if (!to.meta.requiresAuth) {
     return true
   }
-  // 3. 如果已经登录且token存在，直接通过
+  // 3. 如果已经登录且token存在，继续检查管理员权限
   if (userStore.isLoggedIn && userStore.token) {
+    // 检查是否需要管理员权限
+    if (to.meta.requiresAdmin && !userStore.userInfo?.is_admin) {
+      return { name: 'control' } // 非管理员重定向到控制台
+    }
     return true
   }
   // 4. 检查登录状态
@@ -70,7 +88,11 @@ router.beforeEach(async (to, from) => {
     }
     return { name: 'login' }
   }
-  // 6. 已通过验证，允许访问
+  // 6. 已通过验证，检查管理员权限
+  if (to.meta.requiresAdmin && !userStore.userInfo?.is_admin) {
+    return { name: 'control' } // 非管理员重定向到控制台
+  }
+  // 7. 允许访问
   return true
 })
 

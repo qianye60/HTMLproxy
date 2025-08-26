@@ -6,6 +6,7 @@ from fastapi import FastAPI #类型注解
 #引入子级API
 from user.user import user as user_router
 from upfile.upfile import upfile as upfile_router
+from ai.ai import ai as ai_router
 from database import create_db_and_tables
 import os
 from fastapi.responses import FileResponse
@@ -21,6 +22,7 @@ def on_startup():
 # 注册路由
 app.include_router(user_router, prefix='/api', tags=['用户认证'])
 app.include_router(upfile_router, prefix='/api', tags=['文件管理'])
+app.include_router(ai_router, prefix='/api/ai', tags=['AI生成'])
 
 # 配置 CORS
 app.add_middleware(
