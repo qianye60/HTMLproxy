@@ -7,6 +7,7 @@ interface UserInfo {
   username: string
   email: string
   avatar?: string
+  is_admin?: boolean
 }
 
 // 统计卡片接口

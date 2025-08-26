@@ -16,6 +16,10 @@
               <div class="username">{{ userStore.userInfo.username }}</div>
               <div class="user-email">{{ userStore.userInfo.email }}</div>
             </div>
+            <button v-if="userStore.userInfo?.is_admin" @click="goToAdmin" class="admin-btn" title="管理面板">
+              <Settings class="admin-icon" />
+              <span>管理</span>
+            </button>
             <button class="logout-btn" @click="showLogoutConfirm = true" title="退出登录">
               <LogOut class="logout-icon" />
               <span>退出</span>
@@ -324,7 +328,7 @@ import { useUserStore } from '@/stores/user'
 import { useRouter } from 'vue-router'
 import { 
   LayoutDashboard, User, LogOut, FileUp, ClipboardPaste, List, 
-  Pencil, FileText, ExternalLink, Trash2, FolderOpen, X, UploadCloud, Sparkles
+  Pencil, FileText, ExternalLink, Trash2, FolderOpen, X, UploadCloud, Sparkles, Settings
 } from 'lucide-vue-next'
 
 const editInput = ref<HTMLInputElement[]>([])
@@ -564,6 +568,10 @@ const handleLogout = () => {
   router.push('/login');
 }
 
+const goToAdmin = () => {
+  router.push('/admin')
+}
+
 // 处理文件URL，确保在生产环境中使用正确的端口
 const getFileUrl = (url: string): string => {
   // 如果URL已经是完整的绝对路径，直接返回
@@ -666,6 +674,29 @@ const StorageIcon = {
 .user-email {
   font-size: 14px;
   color: #64748b;
+}
+
+.admin-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #e0f2fe;
+  color: #0284c7;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  font-size: 14px;
+}
+.admin-btn:hover {
+  background: #bae6fd;
+  color: #0369a1;
+}
+.admin-icon {
+  width: 16px;
+  height: 16px;
 }
 
 .logout-btn {
