@@ -178,7 +178,7 @@ async def generate_html(
             f"{api_config.base_url}/v1/chat/completions",
             headers=headers,
             json=data,
-            timeout=30
+            timeout=120  # 增加到120秒
         )
         
         if response.status_code != 200:
@@ -189,6 +189,10 @@ async def generate_html(
         
         result = response.json()
         
+        # 调试输出
+        print(f"AI API 响应状态码: {response.status_code}")
+        print(f"AI API 响应内容: {result}")
+        
         if 'choices' not in result or not result['choices']:
             raise HTTPException(
                 status_code=status.HTTP_502_BAD_GATEWAY,
@@ -196,9 +200,11 @@ async def generate_html(
             )
         
         generated_content = result['choices'][0]['message']['content']
+        print(f"AI 生成的原始内容: {repr(generated_content)}")
         
         # 清理生成的内容
         cleaned_content = clean_html_response(generated_content)
+        print(f"清理后的内容: {repr(cleaned_content)}")
         
         # 保存生成记录
         ai_generation = AIGeneration(

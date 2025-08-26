@@ -262,6 +262,19 @@
       </div>
     </div>
 
+    <!-- AI生成等待弹窗 -->
+    <div v-if="showAILoadingModal" class="modal-overlay">
+      <div class="loading-modal" @click.stop>
+        <div class="loading-content">
+          <div class="loading-spinner">
+            <div class="spinner"></div>
+          </div>
+          <h3 class="loading-title">AI正在生成中...</h3>
+          <p class="loading-subtitle">请耐心等待，通常需要10-30秒</p>
+        </div>
+      </div>
+    </div>
+
     <!-- AI生成HTML弹窗 -->
     <div v-if="showAIGenModal" class="modal-overlay" @click="closeAIGenModal">
       <div class="modal-content" @click.stop>
@@ -300,8 +313,8 @@
         </div>
         <div class="modal-footer">
           <button class="cancel-btn" @click="closeAIGenModal">取消</button>
-          <button class="submit-btn" @click="handleAIGenerate" :disabled="!aiPrompt || usageStats.remaining_today <= 0 || userStore.isUploading">
-            {{ userStore.isUploading ? '生成中...' : (usageStats.remaining_today <= 0 ? '今日次数已用完' : '生成HTML') }}
+          <button class="submit-btn" @click="handleAIGenerate" :disabled="!aiPrompt || usageStats.remaining_today <= 0 || showAILoadingModal">
+            {{ showAILoadingModal ? '生成中...' : (usageStats.remaining_today <= 0 ? '今日次数已用完' : '生成HTML') }}
           </button>
           <button v-if="aiHtml" class="submit-btn" @click="uploadAIGeneratedHtml">一键上传</button>
           <button v-if="aiHtml" class="submit-btn" @click="downloadAIGeneratedHtml">下载HTML</button>
@@ -352,6 +365,7 @@ const confirmLogout = () => {
 
 // AI生成HTML弹窗相关
 const showAIGenModal = ref(false)
+const showAILoadingModal = ref(false)
 const aiPrompt = ref('')
 const aiHtml = ref('')
 
@@ -389,7 +403,8 @@ const closeAIGenModal = () => {
 const handleAIGenerate = async () => {
   if (!aiPrompt.value.trim() || usageStats.value.remaining_today <= 0) return
   
-  userStore.isUploading = true
+  // 显示等待弹窗
+  showAILoadingModal.value = true
   aiHtml.value = ''
   
   try {
@@ -418,7 +433,7 @@ const handleAIGenerate = async () => {
   } catch (e) {
     alert('生成失败，请检查网络连接')
   } finally {
-    userStore.isUploading = false
+    showAILoadingModal.value = false
   }
 }
 
@@ -1223,6 +1238,58 @@ const StorageIcon = {
   border: 1px solid #e2e8f0;
   border-radius: 8px;
   background: #fff;
+}
+
+/* AI等待弹窗样式 */
+.loading-modal {
+  background: white;
+  border-radius: 20px;
+  padding: 3rem 2rem;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e2e8f0;
+}
+
+.loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.loading-spinner {
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+
+.spinner {
+  width: 80px;
+  height: 80px;
+  border: 4px solid #f3f4f6;
+  border-top: 4px solid #22c55e;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+.loading-subtitle {
+  color: #64748b;
+  margin: 0;
+  font-size: 1rem;
 }
 
 /* 使用统计显示样式 */
