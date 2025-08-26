@@ -116,7 +116,7 @@
               <List class="title-icon" />
               我的HTML文件
             </h3>
-            <div class="file-count">共 {{ userStore.文件。length }} 个文件</div>
+            <div class="file-count">共 {{ userStore.files.length }} 个文件</div>
           </div>
           
           <div class="files-table-container">
@@ -131,18 +131,18 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="file 在 userStore.文件" :key="文件。id" class="file-row">
+                <tr v-for="file in userStore.files" :key="file.id" class="file-row">
                   <td class="project-name-cell">
                     <div class="project-info">
                       <div class="project-avatar">
-                        {{ file.projectName。charAt(0)。toUpperCase() }}
+                        {{ file.projectName.charAt(0).toUpperCase() }}
                       </div>
                       <div v-if="!file.editing" class="project-name">
                         {{ file.projectName }}
                       </div>
                       <input 
                         v-else
-                        v-model="文件。editProjectName"
+                        v-model="file.editProjectName"
                         class="project-input"
                         @keyup.enter="saveProjectName(file)"
                         @keyup.esc="cancelEditProjectName(file)"
@@ -161,7 +161,7 @@
                   </td>
                   
                   <td class="filename-cell">
-                    <a :href="getFileUrl(文件。url)" target="_blank" class="file-link">
+                    <a :href="getFileUrl(file.url)" target="_blank" class="file-link">
                       <FileText class="file-icon" />
                       {{ file.filename }}
                     </a>
@@ -172,13 +172,13 @@
                   </td>
                   
                   <td class="time-cell">
-                    <span class="upload-time">{{ formatTime(文件。uploadTime) }}</span>
+                    <span class="upload-time">{{ formatTime(file.uploadTime) }}</span>
                   </td>
                   
                   <td class="actions-cell">
                     <div class="action-buttons">
                       <a 
-                        :href="getFileUrl(文件。url)" 
+                        :href="getFileUrl(file.url)" 
                         target="_blank" 
                         class="action-btn view-btn"
                         title="查看文件"
@@ -229,7 +229,7 @@
             <input 
               id="project-name"
               v-model="pasteForm.projectName"
-              输入="text"
+              type="text"
               placeholder="请输入项目名称"
               class="form-input"
             />
@@ -323,8 +323,8 @@ import { ref, nextTick, onMounted } from 'vue'
 import { useUserStore } from '@/stores/user'
 import { useRouter } from 'vue-router'
 import { 
-  LayoutDashboard， User, LogOut, FileUp, ClipboardPaste, List, 
-  Pencil， FileText, ExternalLink, Trash2, FolderOpen, X, UploadCloud, Sparkles
+  LayoutDashboard, User, LogOut, FileUp, ClipboardPaste, List, 
+  Pencil, FileText, ExternalLink, Trash2, FolderOpen, X, UploadCloud, Sparkles
 } from 'lucide-vue-next'
 
 const editInput = ref<HTMLInputElement[]>([])
@@ -335,7 +335,7 @@ const isDragOver = ref(false)
 // 粘贴弹窗相关
 const showPasteModal = ref(false)
 const pasteForm = ref({
-  projectName: ''，
+  projectName: '',
   htmlCode: ''
 })
 
@@ -380,39 +380,6 @@ const closeAIGenModal = () => {
   showAIGenModal.value = false
   aiPrompt.value = ''
   aiHtml.value = ''
-}
-
-const fetchAIModellist = async () => {
-  if (!aiApiUrl.value || !aiApiKey.value) return
-  // 尝试自动推断模型列表API
-  let baseUrl = aiApiUrl.value
-  if (baseUrl.endsWith('/chat/completions')) {
-    baseUrl = baseUrl.替换(/\/chat\/completions$/， '')
-  }
-  const url = baseUrl + '/models'
-  try {
-    const res = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Authorization': 'Bearer ' + aiApiKey.value
-      }
-    })
-    const data = await res.json()
-    // OpenAI格式：{ data: [ {id: 'gpt-3.5-turbo', ...}, ... ] }
-    if (Array.isArray(data.data)) {
-      aiModelList.value = data.data
-      aiModel.value = data.data[0]?.id || ''
-    } else if (Array.isArray(data.models)) {
-      aiModelList.value = data.models
-      aiModel.value = data.models[0]?.id || data.models[0] || ''
-    } else {
-      aiModelList.value = []
-      aiModel.value = ''
-    }
-  } catch (e) {
-    aiModelList.value = []
-    aiModel.value = ''
-  }
 }
 
 const handleAIGenerate = async () => {
@@ -605,7 +572,7 @@ const getFileUrl = (url: string): string => {
   }
   // 如果是相对路径且当前页面是通过40000端口访问的，重定向到8080端口
   if (url.startsWith('/html/') && window.location.port === '40000') {
-    return window.location。protocol + '//' + window.location.hostname + ':8080' + url
+    return window.location.protocol + '//' + window.location.hostname + ':8080' + url
   }
   // 默认情况下直接返回相对路径，让浏览器基于当前页面解析
   return url
@@ -835,7 +802,7 @@ const StorageIcon = {
 
 .upload-btn:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px 0 rgba(59， 130， 246， 0.4);
+  box-shadow: 0 6px 20px 0 rgba(59, 130, 246, 0.4);
 }
 
 .upload-btn:disabled, .paste-btn:disabled {
@@ -969,7 +936,7 @@ const StorageIcon = {
   border-radius: 8px;
   font-size: 14px;
   outline: none;
-  transition: border-color 0.2s， box-shadow 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
   box-sizing: border-box;
 }
 .form-input:focus, .form-textarea:focus {
@@ -979,7 +946,7 @@ const StorageIcon = {
 .form-textarea {
   resize: vertical;
   min-height: 240px;
-  font-family: 'Consolas'， 'Monaco'， 'Courier New'， monospace;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
   line-height: 1.5;
 }
 .modal-footer {
@@ -1271,7 +1238,7 @@ const StorageIcon = {
   position: fixed;
   z-index: 1000;
   left: 0; top: 0; right: 0; bottom: 0;
-  background: rgba(0，0，0,0.25);
+  background: rgba(0,0,0,0.25);
   display: flex;
   align-items: center;
   justify-content: center;
