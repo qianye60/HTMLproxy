@@ -47,17 +47,24 @@ def clean_html_response(response_text: str) -> str:
     """清理AI响应，提取纯HTML内容"""
     # 移除markdown代码块标记
     cleaned = re.sub(r'^```html\s*\n?', '', response_text, flags=re.MULTILINE)
+    cleaned = re.sub(r'^```\s*\n?', '', cleaned, flags=re.MULTILINE)  # 处理普通的```
     cleaned = re.sub(r'\n?```$', '', cleaned, flags=re.MULTILINE)
     
     # 移除多余的说明文字（常见的AI回复模式）
-    cleaned = re.sub(r'^(这是|这里是|以下是).*?HTML.*?[：:]?\s*\n?', '', cleaned, flags=re.MULTILINE | re.IGNORECASE)
+    cleaned = re.sub(r'^(这是|这里是|以下是|这个是).*?HTML.*?[：:]?\s*\n?', '', cleaned, flags=re.MULTILINE | re.IGNORECASE)
     cleaned = re.sub(r'^根据.*?要求.*?[：:]?\s*\n?', '', cleaned, flags=re.MULTILINE | re.IGNORECASE)
+    cleaned = re.sub(r'^我为您.*?[：:]?\s*\n?', '', cleaned, flags=re.MULTILINE | re.IGNORECASE)
+    cleaned = re.sub(r'^好的，我来.*?[：:]?\s*\n?', '', cleaned, flags=re.MULTILINE | re.IGNORECASE)
     
     # 移除开头和结尾的空白
     cleaned = cleaned.strip()
     
-    # 如果内容不以<!DOCTYPE或<html开始，且包含HTML标签，尝试包装
-    if not cleaned.startswith(('<!DOCTYPE', '<html')) and '<' in cleaned and '>' in cleaned:
+    # 检查是否已经是完整的HTML文档
+    if cleaned.startswith('<!DOCTYPE') or cleaned.startswith('<html'):
+        return cleaned
+    
+    # 如果内容包含HTML标签但不是完整文档，尝试包装
+    if '<' in cleaned and '>' in cleaned:
         # 检查是否已经有完整的html结构
         if not ('<html' in cleaned.lower() and '</html>' in cleaned.lower()):
             cleaned = f"""<!DOCTYPE html>
@@ -65,7 +72,7 @@ def clean_html_response(response_text: str) -> str:
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generated Page</title>
+    <title>AI Generated Page</title>
 </head>
 <body>
 {cleaned}
@@ -147,15 +154,54 @@ async def generate_html(
         )
     
     # 构建提示词
-    system_prompt = """你是一个专业的前端开发专家。请根据用户的需求生成完整的HTML网页代码。
+    system_prompt = """你是一个顶级的全栈前端开发大师，专门创建令人惊艳的交互式网页。请根据用户需求生成完整、专业、有趣的HTML页面。
 
-要求：
-1. 生成完整的HTML5页面，包含DOCTYPE、html、head、body标签
-2. 包含必要的meta标签和响应式设计
-3. 内联CSS样式，不使用外部样式文件
-4. 代码规范整洁，注重用户体验
-5. 响应式设计，适配移动端
-6. 只返回HTML代码，不要任何解释文字"""
+核心要求：
+1. **完整的HTML5结构**
+   - 标准DOCTYPE、html、head、body标签
+   - 合适的meta标签（viewport、charset、description等）
+   - 语义化HTML标签（header、main、section、article等）
+
+2. **丰富的CSS样式**（必须内联在<style>标签中）
+   - 使用现代CSS：Grid、Flexbox、CSS变量、渐变、阴影
+   - 响应式设计：@media查询适配手机、平板、桌面
+   - 精美配色：使用协调的颜色方案，支持深色模式切换
+   - 动画效果：CSS animations、transitions、transforms
+   - 现代UI：圆角、毛玻璃效果、渐变按钮、悬浮卡片
+
+3. **强大的JavaScript功能**（必须内联在<script>标签中）
+   - 交互逻辑：事件处理、DOM操作、数据绑定
+   - 实用功能：根据需求实现完整的业务逻辑
+   - 动画增强：JavaScript驱动的复杂动画
+   - 数据处理：本地存储、表单验证、数据计算
+   - 用户体验：加载状态、错误处理、成功提示
+
+4. **内容创意要求**
+   - 功能完整：确保所有功能都能正常工作
+   - 数据丰富：提供示例数据，让页面内容饱满
+   - 交互丰富：多种交互方式，增强用户参与感
+   - 视觉美观：现代化设计，注重细节和美感
+   - 移动友好：完美适配各种屏幕尺寸
+
+5. **推荐生成类型**
+   - 实用工具：计算器、单位转换器、密码生成器、二维码生成器
+   - 小游戏：2048、贪吃蛇、猜数字、记忆卡片、井字棋
+   - 效率应用：待办清单、番茄钟、笔记本、习惯追踪器
+   - 展示页面：个人简历、作品集、公司介绍、产品展示
+   - 娱乐内容：音乐播放器、图片编辑器、天气显示、星座运势
+
+6. **代码质量**
+   - 代码整洁：适当缩进、清晰注释、合理命名
+   - 性能优化：高效算法、避免内存泄漏
+   - 错误处理：完善的异常处理和用户提示
+   - 兼容性：支持主流浏览器
+
+特别注意：
+- 所有CSS和JS都必须内联在HTML文件中，不使用外部文件
+- 确保生成的页面功能完整可用，不是半成品
+- 页面要有实际价值，能解决用户的实际需求
+- 只返回HTML代码，不要任何解释或说明文字
+- 让每个页面都成为一个完整的、可独立运行的Web应用"""
 
     try:
         # 调用AI API
@@ -170,8 +216,11 @@ async def generate_html(
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": request.prompt}
             ],
-            "temperature": 0.7,
-            "max_tokens": 4000
+            "temperature": 0.8,  # 稍微提高创意性
+            "max_tokens": 12000,  # 进一步增加以支持复杂应用
+            "top_p": 0.95,  # 添加top_p参数提高生成质量
+            "frequency_penalty": 0.1,  # 减少重复内容
+            "presence_penalty": 0.1   # 鼓励多样性
         }
         
         response = requests.post(
