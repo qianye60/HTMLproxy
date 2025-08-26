@@ -3,7 +3,6 @@ import HomeView from '../pages/home.vue'
 import LoginView from '../pages/login.vue'
 import ControlView from '../pages/control.vue'
 import AdminView from '../pages/admin.vue'
-import AIGeneratorView from '../pages/ai-generator.vue'
 import { useUserStore } from '@/stores/user'
 
 const router = createRouter({
@@ -25,12 +24,6 @@ const router = createRouter({
       path: '/control',
       name: 'control',
       component: ControlView,
-      meta: { requiresAuth: true }
-    },
-    {
-      path: '/ai-generator',
-      name: 'ai-generator',
-      component: AIGeneratorView,
       meta: { requiresAuth: true }
     },
     {

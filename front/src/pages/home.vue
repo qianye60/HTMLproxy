@@ -344,7 +344,7 @@ const quickStart = () => {
 }
 
 const tryAIGenerator = () => {
-  router.push('/ai-generator')
+  router.push('/control')
 }
 
 const viewDemo = () => {
