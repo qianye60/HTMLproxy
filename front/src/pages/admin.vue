@@ -248,7 +248,7 @@ const checkAdminAccess = () => {
 // 获取统计数据
 const fetchStats = async () => {
   try {
-    const token = localStorage.getItem('token')
+    const token = localStorage.getItem('JWTtoken')
     const response = await fetch('/api/ai/admin/usage-stats', {
       headers: {
         'Authorization': `Bearer ${token}`
@@ -275,7 +275,7 @@ const updateDailyLimit = async () => {
   isUpdatingLimit.value = true
   
   try {
-    const token = localStorage.getItem('token')
+    const token = localStorage.getItem('JWTtoken')
     const response = await fetch(`/api/ai/admin/daily-limit?limit=${dailyLimitForm.value.limit}`, {
       method: 'PUT',
       headers: {
@@ -303,7 +303,7 @@ const updateDailyLimit = async () => {
 // 获取API配置列表
 const fetchApiConfigs = async () => {
   try {
-    const token = localStorage.getItem('token')
+    const token = localStorage.getItem('JWTtoken')
     const response = await fetch('/api/ai/admin/api-configs', {
       headers: {
         'Authorization': `Bearer ${token}`
@@ -321,7 +321,7 @@ const fetchApiConfigs = async () => {
 // 提交配置
 const submitConfig = async () => {
   try {
-    const token = localStorage.getItem('token')
+    const token = localStorage.getItem('JWTtoken')
     const url = editingConfig.value 
       ? `/api/ai/admin/api-configs/${editingConfig.value.id}`
       : '/api/ai/admin/api-configs'
@@ -367,7 +367,7 @@ const deleteConfig = async (id) => {
   if (!confirm('确定要删除此配置吗？')) return
   
   try {
-    const token = localStorage.getItem('token')
+    const token = localStorage.getItem('JWTtoken')
     const response = await fetch(`/api/ai/admin/api-configs/${id}`, {
       method: 'DELETE',
       headers: {

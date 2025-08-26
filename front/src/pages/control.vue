@@ -365,7 +365,7 @@ const usageStats = ref({
 // 获取使用统计
 const fetchUsageStats = async () => {
   try {
-    const token = localStorage.getItem('token')
+    const token = localStorage.getItem('JWTtoken')
     const response = await fetch('/api/ai/usage', {
       headers: {
         'Authorization': `Bearer ${token}`
@@ -393,7 +393,7 @@ const handleAIGenerate = async () => {
   aiHtml.value = ''
   
   try {
-    const token = localStorage.getItem('token')
+    const token = localStorage.getItem('JWTtoken')
     const res = await fetch('/api/ai/generate', {
       method: 'POST',
       headers: {
